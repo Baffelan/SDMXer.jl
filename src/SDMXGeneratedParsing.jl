@@ -96,7 +96,7 @@ This generated function provides significant performance improvements over runti
 - Better scaling with large SDMX documents
 
 # See also
-[`extract_element_fields`](@ref), [`get_xpath_patterns`](@ref), [`DimensionElement`](@ref)
+[`get_xpath_patterns`](@ref), [`DimensionElement`](@ref)
 """
 @generated function extract_sdmx_element(::Type{T}, node::EzXML.Node) where T <: SDMXElement
     if T <: DimensionElement
@@ -292,7 +292,7 @@ println(attr_patterns.attachment)    # ".//structure:AttributeRelationship"
 ```
 
 # See also
-[`extract_sdmx_element`](@ref), [`extract_element_fields`](@ref)
+[`extract_sdmx_element`](@ref)
 """
 @generated function get_xpath_patterns(::Type{T}) where T <: SDMXElement
     if T <: DimensionElement

@@ -57,7 +57,7 @@ println("Required attributes: ", required_attrs.concept_id)
 ```
 
 # See also
-[`extract_dataflow_schema`](@ref), [`DataflowInfo`](@ref), [`DimensionInfo`](@ref)
+[`extract_dataflow_schema`](@ref)
 """
 struct DataflowSchema
     dataflow_info::NamedTuple

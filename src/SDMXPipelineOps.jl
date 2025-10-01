@@ -100,7 +100,7 @@ result = validator_func(my_data)
 ```
 
 # See also
-[`⇒`](@ref), [`create_validator`](@ref), [`profile_with`](@ref)
+[`⇒`](@ref), [`create_validator`](@ref)
 """
 function validate_with(schema::DataflowSchema; kwargs...)
     validator = create_validator(schema; kwargs...)
@@ -219,7 +219,7 @@ results = [dataset1, dataset2] .|> Ref(standard_pipeline)
 ```
 
 # See also
-[`SDMXPipeline`](@ref), [`chain`](@ref), [`|>`](@ref)
+[`SDMXPipeline`](@ref), [`chain`](@ref)
 """
 function pipeline(operations...)
     return SDMXPipeline(operations)
@@ -370,7 +370,7 @@ transformed = dataframes |> parallel_map(data -> transform(data, :col => :new_co
 - `BoundsError`: If collections are empty
 
 # See also
-[`chain`](@ref), [`Base.Threads.@threads`](@ref)
+[`chain`](@ref)
 """
 function parallel_map(f::Function)
     return collections -> begin

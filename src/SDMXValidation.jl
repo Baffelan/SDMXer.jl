@@ -108,7 +108,7 @@ add_custom_validation_rule(validator, structure_rule)
 ```
 
 # See also
-[`ValidationSeverity`](@ref), [`SDMXValidator`](@ref), [`add_custom_validation_rule`](@ref)
+[`ValidationSeverity`](@ref), [`SDMXValidator`](@ref)
 """
 struct ValidationRule
     rule_id::String
@@ -212,7 +212,7 @@ println(report)
 ```
 
 # See also
-[`ValidationIssue`](@ref), [`validate_sdmx_csv`](@ref), [`generate_validation_report`](@ref)
+[`validate_sdmx_csv`](@ref), [`generate_validation_report`](@ref)
 """
 struct ValidationResult
     dataset_name::String
@@ -557,7 +557,7 @@ fast_validator = create_validator(
 ```
 
 # See also
-[`SDMXValidator`](@ref), [`validate_sdmx_csv`](@ref), [`load_default_validation_rules!`](@ref)
+[`SDMXValidator`](@ref), [`validate_sdmx_csv`](@ref)
 """
 function create_validator(schema::DataflowSchema; 
                          strict_mode=false, 
@@ -622,7 +622,7 @@ The function loads rules in these categories:
 - **Compliance**: SDMX-CSV format adherence
 
 # See also
-[`create_validator`](@ref), [`ValidationRule`](@ref), [`add_custom_validation_rule`](@ref)
+[`create_validator`](@ref), [`ValidationRule`](@ref)
 """
 function load_default_validation_rules!(validator::SDMXValidator)
     schema = validator.schema

@@ -39,7 +39,7 @@ end
 ```
 
 # See also
-[`process_code_node`](@ref), [`extract_codelist`](@ref), [`process_codelist_node`](@ref)
+[`process_code_node`](@ref)
 """
 function get_parent_id(code_node::EzXML.Node)
     ref_node = findfirst(".//structure:Parent/Ref", code_node)
@@ -88,7 +88,7 @@ println("English name: ", english_record.name)
 ```
 
 # See also
-[`get_parent_id`](@ref), [`process_codelist_node`](@ref), [`extract_codelist`](@ref)
+[`get_parent_id`](@ref)
 """
 function process_code_node(code_node::EzXML.Node)
     node_rows = []

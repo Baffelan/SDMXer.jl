@@ -38,7 +38,7 @@ demonstrate_generated_parsing(verbose=false)
 ```
 
 # See also
-[`extract_sdmx_element`](@ref), [`benchmark_all_element_types`](@ref)
+[`extract_sdmx_element`](@ref)
 """
 function demonstrate_generated_parsing(; verbose::Bool=true)
     verbose && println("🚀 Generated Function SDMX Parsing Demonstration")
