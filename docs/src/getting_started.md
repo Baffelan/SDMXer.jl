@@ -6,7 +6,7 @@ Install SDMXer.jl from the Julia package registry:
 
 ```julia
 using Pkg
-Pkg.add("SDMX")
+Pkg.add("SDMXer")
 ```
 
 ## Basic Workflow
