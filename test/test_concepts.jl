@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using DataFrames
 
 @testset "Concept Extraction" begin

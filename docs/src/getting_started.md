@@ -2,7 +2,7 @@
 
 ## Installation
 
-Install SDMX.jl from the Julia package registry:
+Install SDMXer.jl from the Julia package registry:
 
 ```julia
 using Pkg
@@ -16,7 +16,7 @@ Pkg.add("SDMX")
 The first step is to extract the dataflow schema from an SDMX-ML document or API endpoint:
 
 ```julia
-using SDMX
+using SDMXer
 
 url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50/latest?references=all"
 schema = extract_dataflow_schema(url)
@@ -98,7 +98,7 @@ data = fetch_sdmx_data(data_url)
 
 ## Using Pipelines
 
-SDMX.jl supports functional pipeline operations:
+SDMXer.jl supports functional pipeline operations:
 
 ```julia
 # Chain operations
@@ -107,7 +107,7 @@ result = schema |>
     v -> validate_sdmx_csv(v, "data.csv")
 
 # Or use the pipe operator
-using SDMX: ⇒
+using SDMXer: ⇒
 
 schema ⇒ validate_with(codelists, "data.csv")
 ```
@@ -116,4 +116,4 @@ schema ⇒ validate_with(codelists, "data.csv")
 
 - Explore the [API Reference](api/schema.md) for detailed function documentation
 - Check out [Examples](examples.md) for more use cases
-- For LLM-powered data transformation, see [SDMXLLM.jl](https://github.com/Baffelan/SDMXLLM.jl)
+- For LLM-powered data transformation, see [SDMXerWizard.jl](https://github.com/Baffelan/SDMXerWizard.jl)

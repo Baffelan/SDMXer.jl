@@ -5,23 +5,23 @@ Functional programming interface for chaining SDMX operations.
 ## Main Functions
 
 ```@docs
-SDMX.validate_with
-SDMX.chain
-SDMX.pipeline
-SDMX.tap
-SDMX.branch
-SDMX.parallel_map
+SDMXer.validate_with
+SDMXer.chain
+SDMXer.pipeline
+SDMXer.tap
+SDMXer.branch
+SDMXer.parallel_map
 ```
 
 ## Types
 
 ```@docs
-SDMX.SDMXPipeline
+SDMXer.SDMXPipeline
 ```
 
 ## Pipeline Operators
 
 ```@docs
 Base.:⊆
-SDMX.:⇒
+SDMXer.:⇒
 ```

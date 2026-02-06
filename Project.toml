@@ -1,4 +1,4 @@
-name = "SDMX"
+name = "SDMXer"
 uuid = "88354817-cd1f-48b9-9770-05d0dc5d6299"
 authors = ["Giulio Valentino Dalla Riva <me@gvdallariva.net>"]
 version = "0.1.0"

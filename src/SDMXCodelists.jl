@@ -1,5 +1,5 @@
 """
-Codelist-related functions for SDMX.jl
+Codelist-related functions for SDMXer.jl
 """
 
 using EzXML, DataFrames, HTTP

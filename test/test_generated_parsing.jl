@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using EzXML
 using DataFrames
 
@@ -19,7 +19,7 @@ using DataFrames
         code_node = findfirst(".//structure:Code[@id='M']", codelist_node)
         @test code_node !== nothing
         
-        result = SDMX.extract_code_info(code_node)
+        result = SDMXer.extract_code_info(code_node)
         @test result.code_id == "M"
         @test result.name == "Male"
         @test ismissing(result.parent_code_id)
@@ -27,7 +27,7 @@ using DataFrames
         # Test code with parent
         code_with_parent = findfirst(".//structure:Code[@parentCode]", root_node)
         if code_with_parent !== nothing
-            result_parent = SDMX.extract_code_info(code_with_parent)
+            result_parent = SDMXer.extract_code_info(code_with_parent)
             @test !ismissing(result_parent.parent_code_id)
         end
     end
@@ -37,7 +37,7 @@ using DataFrames
         dim_node = findfirst("//structure:DataStructure[@id='DSD_BP50']//structure:Dimension[@id='FREQ']", root_node)
         @test dim_node !== nothing
         
-        result = SDMX.extract_sdmx_element(SDMX.DimensionElement, dim_node)
+        result = SDMXer.extract_sdmx_element(SDMXer.DimensionElement, dim_node)
         @test result.dimension_id == "FREQ"
         @test result.position == 1
         @test result.concept_id == "FREQ"
@@ -50,7 +50,7 @@ using DataFrames
         geo_dim = findfirst("//structure:DataStructure[@id='DSD_BP50']//structure:Dimension[@id='GEO_PICT']", root_node)
         @test geo_dim !== nothing
         
-        result_geo = SDMX.extract_sdmx_element(SDMX.DimensionElement, geo_dim)
+        result_geo = SDMXer.extract_sdmx_element(SDMXer.DimensionElement, geo_dim)
         @test result_geo.dimension_id == "GEO_PICT"
         @test result_geo.position == 3
         @test result_geo.codelist_id == "CL_COM_GEO_PICT"
@@ -62,7 +62,7 @@ using DataFrames
         time_node = findfirst("//structure:TimeDimension[@id='TIME_PERIOD']", root_node)
         @test time_node !== nothing
         
-        result = SDMX.extract_sdmx_element(SDMX.DimensionElement, time_node)
+        result = SDMXer.extract_sdmx_element(SDMXer.DimensionElement, time_node)
         @test result.dimension_id == "TIME_PERIOD"
         @test result.position == 12
         @test result.concept_id == "TIME_PERIOD"
@@ -76,7 +76,7 @@ using DataFrames
         attr_node = findfirst("//structure:Attribute[@id='UNIT_MEASURE']", root_node)
         @test attr_node !== nothing
         
-        result = SDMX.extract_sdmx_element(SDMX.AttributeElement, attr_node)
+        result = SDMXer.extract_sdmx_element(SDMXer.AttributeElement, attr_node)
         @test result.attribute_id == "UNIT_MEASURE"
         @test result.assignment_status == "Conditional"
         @test result.concept_id == "UNIT_MEASURE"
@@ -87,7 +87,7 @@ using DataFrames
         cond_attr = findfirst("//structure:Attribute[@id='OBS_STATUS']", root_node)
         @test cond_attr !== nothing
         
-        result_cond = SDMX.extract_sdmx_element(SDMX.AttributeElement, cond_attr)
+        result_cond = SDMXer.extract_sdmx_element(SDMXer.AttributeElement, cond_attr)
         @test result_cond.attribute_id == "OBS_STATUS"
         @test result_cond.assignment_status == "Conditional"
         @test result_cond.attachment_level == "PrimaryMeasure"
@@ -98,7 +98,7 @@ using DataFrames
         measure_node = findfirst("//structure:PrimaryMeasure[@id='OBS_VALUE']", root_node)
         @test measure_node !== nothing
         
-        result = SDMX.extract_sdmx_element(SDMX.MeasureElement, measure_node)
+        result = SDMXer.extract_sdmx_element(SDMXer.MeasureElement, measure_node)
         @test result.measure_id == "OBS_VALUE"
         @test result.concept_id == "OBS_VALUE"
         @test result.data_type == "Double"
@@ -110,7 +110,7 @@ using DataFrames
         concept_node = findfirst("//structure:Concept[@id='FREQ']", root_node)
         @test concept_node !== nothing
         
-        result = SDMX.extract_sdmx_element(SDMX.ConceptElement, concept_node)
+        result = SDMXer.extract_sdmx_element(SDMXer.ConceptElement, concept_node)
         @test result.concept_id == "FREQ"
         @test result.name == "Frequency"
         # Description might be missing for some concepts
@@ -118,7 +118,7 @@ using DataFrames
         # Test concept with both name and description
         time_concept = findfirst("//structure:Concept[@id='TIME_PERIOD']", root_node)
         if time_concept !== nothing
-            result_time = SDMX.extract_sdmx_element(SDMX.ConceptElement, time_concept)
+            result_time = SDMXer.extract_sdmx_element(SDMXer.ConceptElement, time_concept)
             @test result_time.concept_id == "TIME_PERIOD"
             @test !ismissing(result_time.name)
         end
@@ -129,7 +129,7 @@ using DataFrames
         codelist_node = findfirst("//structure:Codelist[@id='CL_COM_SEX']", root_node)
         @test codelist_node !== nothing
         
-        result = SDMX.extract_sdmx_element(SDMX.CodelistElement, codelist_node)
+        result = SDMXer.extract_sdmx_element(SDMXer.CodelistElement, codelist_node)
         @test result.codelist_id == "CL_COM_SEX"
         @test result.agency_id == "SPC"
         @test result.version == "1.0"
@@ -145,26 +145,26 @@ using DataFrames
         geo_codelist = findfirst("//structure:Codelist[@id='CL_COM_GEO_PICT']", root_node)
         @test geo_codelist !== nothing
         
-        result_geo = SDMX.extract_sdmx_element(SDMX.CodelistElement, geo_codelist)
+        result_geo = SDMXer.extract_sdmx_element(SDMXer.CodelistElement, geo_codelist)
         @test result_geo.codelist_id == "CL_COM_GEO_PICT"
         @test length(result_geo.codes) > 10  # Pacific countries codelist has many codes
     end
     
     @testset "get_xpath_patterns" begin
         # Test that XPath patterns are correctly generated
-        dim_patterns = SDMX.get_xpath_patterns(SDMX.DimensionElement)
+        dim_patterns = SDMXer.get_xpath_patterns(SDMXer.DimensionElement)
         @test dim_patterns.concept_ref == ".//structure:ConceptIdentity/Ref"
         @test dim_patterns.codelist_ref == ".//structure:LocalRepresentation/structure:Enumeration/Ref"
         @test dim_patterns.text_format == ".//structure:LocalRepresentation/structure:TextFormat"
         
-        attr_patterns = SDMX.get_xpath_patterns(SDMX.AttributeElement)
+        attr_patterns = SDMXer.get_xpath_patterns(SDMXer.AttributeElement)
         @test attr_patterns.concept_ref == ".//structure:ConceptIdentity/Ref"
         @test attr_patterns.codelist_ref == ".//structure:LocalRepresentation/structure:Enumeration/Ref"
         @test attr_patterns.attachment == ".//structure:AttributeRelationship"
         @test attr_patterns.group_ref == ".//structure:AttributeRelationship/structure:Group"
         @test attr_patterns.dimension_ref == ".//structure:AttributeRelationship/structure:Dimension"
         
-        measure_patterns = SDMX.get_xpath_patterns(SDMX.MeasureElement)
+        measure_patterns = SDMXer.get_xpath_patterns(SDMXer.MeasureElement)
         @test measure_patterns.concept_ref == ".//structure:ConceptIdentity/Ref"
         @test measure_patterns.text_format == ".//structure:LocalRepresentation/structure:TextFormat"
     end
@@ -174,7 +174,7 @@ using DataFrames
         category_node = findfirst("//structure:Category[@id='SDG']", root_node)
         @test category_node !== nothing
         
-        result = SDMX.extract_generic_element(category_node)
+        result = SDMXer.extract_generic_element(category_node)
         @test result.element_id == "SDG"
         @test result.element_name == "Category"
         @test result.raw_node === category_node
@@ -185,7 +185,7 @@ using DataFrames
         dim_no_format = findfirst("//structure:Dimension[@id='INDICATOR']", root_node)
         @test dim_no_format !== nothing
         
-        result = SDMX.extract_sdmx_element(SDMX.DimensionElement, dim_no_format)
+        result = SDMXer.extract_sdmx_element(SDMXer.DimensionElement, dim_no_format)
         @test result.dimension_id == "INDICATOR"
         @test !ismissing(result.codelist_id)
         @test ismissing(result.data_type)  # No TextFormat element
@@ -194,14 +194,14 @@ using DataFrames
         text_attr = findfirst("//structure:Attribute[@id='DATA_SOURCE']", root_node)
         @test text_attr !== nothing
         
-        result_text = SDMX.extract_sdmx_element(SDMX.AttributeElement, text_attr)
+        result_text = SDMXer.extract_sdmx_element(SDMXer.AttributeElement, text_attr)
         @test result_text.attribute_id == "DATA_SOURCE"
         @test ismissing(result_text.codelist_id)  # Has TextFormat, not Enumeration
         
         # Test concept without description
         concept_no_desc = findfirst("//structure:Concept[not(.//common:Description)]", root_node)
         if concept_no_desc !== nothing
-            result_no_desc = SDMX.extract_sdmx_element(SDMX.ConceptElement, concept_no_desc)
+            result_no_desc = SDMXer.extract_sdmx_element(SDMXer.ConceptElement, concept_no_desc)
             @test !ismissing(result_no_desc.concept_id)
             @test ismissing(result_no_desc.description)
         end
@@ -213,7 +213,7 @@ using DataFrames
         @test length(dim_nodes) > 5
         
         # Extract multiple dimensions - should use compiled specialization
-        results = [SDMX.extract_sdmx_element(SDMX.DimensionElement, node) for node in dim_nodes[1:min(5, length(dim_nodes))]]
+        results = [SDMXer.extract_sdmx_element(SDMXer.DimensionElement, node) for node in dim_nodes[1:min(5, length(dim_nodes))]]
         @test all(r -> !ismissing(r.dimension_id), results)
         @test all(r -> !ismissing(r.position), results)
         
@@ -221,7 +221,7 @@ using DataFrames
         attr_nodes = findall("//structure:Attribute", root_node)
         @test length(attr_nodes) > 3
         
-        attr_results = [SDMX.extract_sdmx_element(SDMX.AttributeElement, node) for node in attr_nodes[1:min(3, length(attr_nodes))]]
+        attr_results = [SDMXer.extract_sdmx_element(SDMXer.AttributeElement, node) for node in attr_nodes[1:min(3, length(attr_nodes))]]
         @test all(r -> !ismissing(r.attribute_id), attr_results)
     end
 end

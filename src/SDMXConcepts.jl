@@ -1,5 +1,5 @@
 """
-Concept extraction functions for SDMX.jl
+Concept extraction functions for SDMXer.jl
 """
 
 using EzXML, DataFrames, HTTP

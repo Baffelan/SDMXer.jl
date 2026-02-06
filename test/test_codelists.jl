@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using DataFrames
 
 @testset "Codelist Extraction" begin
@@ -79,19 +79,19 @@ end
         </structure:Codelists>
     </structure:Structure>
     """
-    doc = SDMX.EzXML.parsexml(xml_string)
-    root_node = SDMX.EzXML.root(doc)
+    doc = SDMXer.EzXML.parsexml(xml_string)
+    root_node = SDMXer.EzXML.root(doc)
 
     @testset "get_parent_id" begin
         code_a_node = findfirst("//structure:Code[@id='A']", root_node)
         code_b_node = findfirst("//structure:Code[@id='B']", root_node)
-        @test ismissing(SDMX.get_parent_id(code_a_node))
-        @test SDMX.get_parent_id(code_b_node) == "A"
+        @test ismissing(SDMXer.get_parent_id(code_a_node))
+        @test SDMXer.get_parent_id(code_b_node) == "A"
     end
 
     @testset "process_code_node" begin
         code_a_node = findfirst("//structure:Code[@id='A']", root_node)
-        processed_code = SDMX.process_code_node(code_a_node)
+        processed_code = SDMXer.process_code_node(code_a_node)
         @test length(processed_code) == 1
         @test processed_code[1].code_id == "A"
         @test processed_code[1].name == "Code A"
@@ -100,7 +100,7 @@ end
 
     @testset "extract_codes_from_codelist_node" begin
         codelist_node = findfirst("//structure:Codelist", root_node)
-        codes = SDMX.extract_codes_from_codelist_node(codelist_node)
+        codes = SDMXer.extract_codes_from_codelist_node(codelist_node)
         @test length(codes) == 2
         @test codes[1].codelist_id == "CL_TEST"
         @test codes[2].parent_code_id == "A"

@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using DataFrames
 
 @testset "Data Query Construction" begin
@@ -16,7 +16,7 @@ using DataFrames
         # Test correct ordering
         filters = Dict("GEO_PICT" => "FJ", "FREQ" => "A", "INDICATOR" => "BP50_01")
 
-        key = SDMX.construct_sdmx_key(spc_schema, filters)
+        key = SDMXer.construct_sdmx_key(spc_schema, filters)
 
         key_parts = split(key, '.')
         freq_idx = findfirst(d -> d == "FREQ", dim_order)
@@ -27,17 +27,17 @@ using DataFrames
 
         # Test with an invalid dimension
         invalid_filters = Dict("INVALID_DIM" => "value")
-        @test_throws ArgumentError SDMX.construct_sdmx_key(spc_schema, invalid_filters)
+        @test_throws ArgumentError SDMXer.construct_sdmx_key(spc_schema, invalid_filters)
         
         # Test with empty filters
         empty_filters = Dict{String,String}()
-        key_empty = SDMX.construct_sdmx_key(spc_schema, empty_filters)
+        key_empty = SDMXer.construct_sdmx_key(spc_schema, empty_filters)
         @test occursin(".", key_empty)  # Should have dots for separators
         @test all(p -> p == "", split(key_empty, '.'))  # All parts should be empty
         
         # Test with partial filters
         partial_filters = Dict("FREQ" => "M")
-        key_partial = SDMX.construct_sdmx_key(spc_schema, partial_filters)
+        key_partial = SDMXer.construct_sdmx_key(spc_schema, partial_filters)
         key_parts_partial = split(key_partial, '.')
         @test key_parts_partial[freq_idx] == "M"
         # Other dimensions should be empty strings
@@ -45,11 +45,11 @@ using DataFrames
         
         # Test with all dimensions specified (using actual dimension order)
         all_dims = Dict{String,String}()
-        actual_dim_order = SDMX.get_dimension_order(spc_schema)
+        actual_dim_order = SDMXer.get_dimension_order(spc_schema)
         for dim in actual_dim_order
             all_dims[dim] = "TEST"
         end
-        key_all = SDMX.construct_sdmx_key(spc_schema, all_dims)
+        key_all = SDMXer.construct_sdmx_key(spc_schema, all_dims)
         @test !occursin("..", key_all)  # No double dots
         @test all(p -> p == "TEST", split(key_all, '.'))
     end
@@ -116,7 +116,7 @@ using DataFrames
             OTHER_COL = ["A", missing]
         )
 
-        cleaned_df = SDMX.clean_sdmx_data(dirty_df)
+        cleaned_df = SDMXer.clean_sdmx_data(dirty_df)
 
         @test eltype(cleaned_df.OBS_VALUE) <: Union{Missing, Float64}
         @test skipmissing(cleaned_df.OBS_VALUE) |> collect == [123.45, 67.8]
@@ -128,7 +128,7 @@ using DataFrames
             OBS_VALUE = ["10", missing, "", "20"],
             TIME_PERIOD = [2020, 2021, 2022, 2023]
         )
-        cleaned_df_missing = SDMX.clean_sdmx_data(dirty_df_missing)
+        cleaned_df_missing = SDMXer.clean_sdmx_data(dirty_df_missing)
         @test count(ismissing, cleaned_df_missing.OBS_VALUE) == 2  # missing and "" become missing
         @test skipmissing(cleaned_df_missing.OBS_VALUE) |> collect == [10.0, 20.0]
         
@@ -137,7 +137,7 @@ using DataFrames
             OBS_VALUE = ["100", "not_a_number", "200.5"],
             TIME_PERIOD = ["2020", "2021", "2022"]
         )
-        cleaned_df_text = SDMX.clean_sdmx_data(dirty_df_text)
+        cleaned_df_text = SDMXer.clean_sdmx_data(dirty_df_text)
         # Invalid number becomes nothing from tryparse, which then becomes missing
         @test cleaned_df_text.OBS_VALUE[2] === nothing || ismissing(cleaned_df_text.OBS_VALUE[2])
         @test cleaned_df_text.OBS_VALUE[1] == 100.0
@@ -148,7 +148,7 @@ using DataFrames
             OBS_VALUE = [1.0, 2.0, 3.0],
             TIME_PERIOD = ["2020", "2021", "2022"]
         )
-        cleaned_already = SDMX.clean_sdmx_data(already_clean)
+        cleaned_already = SDMXer.clean_sdmx_data(already_clean)
         @test cleaned_already.OBS_VALUE == [1.0, 2.0, 3.0]
         
         # Test with completely empty rows
@@ -157,7 +157,7 @@ using DataFrames
             TIME_PERIOD = ["2020", missing, "2022"],
             OTHER = ["A", missing, "C"]
         )
-        cleaned_no_empty = SDMX.clean_sdmx_data(df_with_empty)
+        cleaned_no_empty = SDMXer.clean_sdmx_data(df_with_empty)
         @test nrow(cleaned_no_empty) == 3  # Row 2 has some non-missing values
         
         # Test with DataFrame without standard columns
@@ -165,19 +165,19 @@ using DataFrames
             COL1 = [1, 2, 3],
             COL2 = ["A", "B", "C"]
         )
-        cleaned_non_standard = SDMX.clean_sdmx_data(non_standard)
+        cleaned_non_standard = SDMXer.clean_sdmx_data(non_standard)
         @test cleaned_non_standard == non_standard  # Should return unchanged
         
         # Test with empty DataFrame
         empty_df = DataFrame()
-        cleaned_empty = SDMX.clean_sdmx_data(empty_df)
+        cleaned_empty = SDMXer.clean_sdmx_data(empty_df)
         @test cleaned_empty == empty_df
         @test nrow(cleaned_empty) == 0
     end
     
     @testset "get_dimension_order" begin
         # Test that dimension order is extracted correctly from schema
-        dim_order = SDMX.get_dimension_order(spc_schema)
+        dim_order = SDMXer.get_dimension_order(spc_schema)
         @test dim_order isa Vector{String}
         @test !isempty(dim_order)
         @test "FREQ" in dim_order
@@ -195,9 +195,9 @@ using DataFrames
         # but not make actual network calls in unit tests
         
         # Test that the function exists and has the expected signature
-        @test hasmethod(SDMX.query_sdmx_data, 
+        @test hasmethod(SDMXer.query_sdmx_data, 
                        Tuple{String, String, String, String})
-        @test hasmethod(SDMX.query_sdmx_data, 
+        @test hasmethod(SDMXer.query_sdmx_data, 
                        Tuple{String, String, String})  # version defaults to "latest"
         
         # Test TIME_PERIOD range parsing without actual HTTP calls
@@ -214,7 +214,7 @@ using DataFrames
             INDICATOR = ["GDP", "GDP", "CPI", "CPI"]
         )
         
-        summary = SDMX.summarize_data(test_data)
+        summary = SDMXer.summarize_data(test_data)
         
         @test summary["total_observations"] == 4
         @test summary["time_range"] == ("2020", "2023")
@@ -229,7 +229,7 @@ using DataFrames
         @test summary["indicator"] == ["CPI", "GDP"]
         
         # Test with empty DataFrame
-        empty_summary = SDMX.summarize_data(DataFrame())
+        empty_summary = SDMXer.summarize_data(DataFrame())
         @test empty_summary["total_observations"] == 0
         
         # Test with DataFrame without standard SDMX columns
@@ -237,7 +237,7 @@ using DataFrames
             COL1 = [1, 2, 3],
             COL2 = ["A", "B", "C"]
         )
-        non_standard_summary = SDMX.summarize_data(non_standard_data)
+        non_standard_summary = SDMXer.summarize_data(non_standard_data)
         @test non_standard_summary["total_observations"] == 3
         @test !haskey(non_standard_summary, "time_range")
         @test !haskey(non_standard_summary, "obs_stats")
@@ -249,7 +249,7 @@ using DataFrames
             TIME_PERIOD = ["2020", "2021"],
             OBS_VALUE = [missing, missing]
         )
-        all_missing_summary = SDMX.summarize_data(all_missing_data)
+        all_missing_summary = SDMXer.summarize_data(all_missing_data)
         @test all_missing_summary["total_observations"] == 2
         @test !haskey(all_missing_summary, "obs_stats")  # No stats if all values are missing
         
@@ -259,25 +259,25 @@ using DataFrames
             OBS_VALUE = [100.0, 200.0],
             FREQ = ["A", "A"]
         )
-        freq_summary = SDMX.summarize_data(freq_data)
+        freq_summary = SDMXer.summarize_data(freq_data)
         @test freq_summary["freq"] == ["A"]
     end
     
     @testset "format_dimension_value" begin
         # Test the helper function for formatting dimension values
-        @test SDMX.format_dimension_value("TEST") == "TEST"
-        @test SDMX.format_dimension_value(["A", "B", "C"]) == "A+B+C"
-        @test SDMX.format_dimension_value(nothing) == ""
-        @test SDMX.format_dimension_value(["SINGLE"]) == "SINGLE"
+        @test SDMXer.format_dimension_value("TEST") == "TEST"
+        @test SDMXer.format_dimension_value(["A", "B", "C"]) == "A+B+C"
+        @test SDMXer.format_dimension_value(nothing) == ""
+        @test SDMXer.format_dimension_value(["SINGLE"]) == "SINGLE"
     end
     
     @testset "fetch_sdmx_data error handling" begin
         # Test with invalid URL (should throw ArgumentError)
-        @test_throws ArgumentError SDMX.fetch_sdmx_data("not_a_url")
+        @test_throws ArgumentError SDMXer.fetch_sdmx_data("not_a_url")
         
         # Test timeout parameter is passed correctly
         # Note: We can't test actual timeout without making network calls
-        @test hasmethod(SDMX.fetch_sdmx_data, Tuple{String})
+        @test hasmethod(SDMXer.fetch_sdmx_data, Tuple{String})
     end
     
     @testset "Integration test - construct and validate URLs" begin
@@ -308,7 +308,7 @@ using DataFrames
         @test occursin("FJ", url)  # GEO_PICT value
         
         # Verify the key is properly constructed
-        key = SDMX.construct_sdmx_key(spc_schema, valid_filters)
+        key = SDMXer.construct_sdmx_key(spc_schema, valid_filters)
         @test occursin(key, url) || occursin(replace(key, "." => "%2E"), url)  # URL encoding
     end
 end

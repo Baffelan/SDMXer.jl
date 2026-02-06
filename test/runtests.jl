@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using DataFrames
 using HTTP
 using Dates
@@ -8,7 +8,7 @@ using EzXML
 # Helper function to get the path to a fixture file
 fixture_path(filename) = joinpath(@__DIR__, "fixtures", filename)
 
-@testset "SDMX.jl" begin
+@testset "SDMXer.jl" begin
     # Run Aqua quality checks first
     @testset "Code Quality (Aqua.jl)" begin
         include("aqua.jl")

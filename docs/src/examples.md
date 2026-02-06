@@ -5,7 +5,7 @@
 This example demonstrates a complete workflow from schema extraction to data validation:
 
 ```julia
-using SDMX, CSV, DataFrames
+using SDMXer, CSV, DataFrames
 
 # Define SDMX API endpoint
 url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50/latest?references=all"
@@ -39,7 +39,7 @@ println(report)
 Example using the Pacific Data Hub SDMX API:
 
 ```julia
-using SDMX
+using SDMXer
 
 # Balance of Payments dataflow
 bp_url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50/latest?references=all"
@@ -65,7 +65,7 @@ data = fetch_sdmx_data(query_url)
 Working with hierarchical codelists:
 
 ```julia
-using SDMX
+using SDMXer
 
 url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50/latest?references=all"
 
@@ -87,7 +87,7 @@ end
 Create a validator with custom validation rules:
 
 ```julia
-using SDMX
+using SDMXer
 
 schema = extract_dataflow_schema(url)
 codelists = extract_all_codelists(url, true)
@@ -108,7 +108,7 @@ println(preview)
 Using functional pipeline style:
 
 ```julia
-using SDMX
+using SDMXer
 
 # Define a validation pipeline
 validation_pipeline = pipeline(
@@ -127,7 +127,7 @@ result = validation_pipeline(url)
 Analyze temporal and dimensional coverage:
 
 ```julia
-using SDMX
+using SDMXer
 
 url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50/latest?references=all"
 
@@ -150,7 +150,7 @@ end
 Query multiple data series at once:
 
 ```julia
-using SDMX, DataFrames
+using SDMXer, DataFrames
 
 # Define multiple queries
 queries = [

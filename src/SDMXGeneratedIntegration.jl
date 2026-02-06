@@ -174,7 +174,7 @@ function migration_guide(; verbose::Bool=true)
     verbose && println("\\n🎯 Step 2: Import Required Types")
     verbose && println("-" ^ 35)
     verbose && println("```julia")
-    verbose && println("using SDMX: DimensionElement, AttributeElement, MeasureElement,")
+    verbose && println("using SDMXer: DimensionElement, AttributeElement, MeasureElement,")
     verbose && println("           extract_sdmx_element")
     verbose && println("```")
     

@@ -1,4 +1,4 @@
-# SDMX.jl Documentation
+# SDMXer.jl Documentation
 
 ```@meta
 CurrentModule = SDMX
@@ -29,7 +29,7 @@ Pkg.add("SDMX")
 ## Quick Example
 
 ```julia
-using SDMX, DataFrames
+using SDMXer, DataFrames
 
 # Extract SDMX schema from API
 url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50/latest?references=all"
@@ -54,4 +54,4 @@ result = validate_sdmx_csv(validator, "my_data.csv")
 
 ## See Also
 
-- [SDMXLLM.jl](https://github.com/Baffelan/SDMXLLM.jl) - LLM-powered extension for intelligent data transformation
+- [SDMXerWizard.jl](https://github.com/Baffelan/SDMXerWizard.jl) - LLM-powered extension for intelligent data transformation

@@ -1,5 +1,5 @@
 """
-Dataflow structure extraction functions for SDMX.jl
+Dataflow structure extraction functions for SDMXer.jl
 
 This module extracts complete dataflow schema information including:
 - Dataflow metadata (name, description, agency, version)

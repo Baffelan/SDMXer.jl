@@ -1,33 +1,33 @@
-# SDMX Element Types
+# SDMXer Element Types
 
 Type-specialized parsing system using @generated functions for compile-time optimization.
 
 ## Element Types
 
 ```@docs
-SDMX.SDMXElement
-SDMX.DimensionElement
-SDMX.AttributeElement
-SDMX.MeasureElement
-SDMX.ConceptElement
-SDMX.CodelistElement
-SDMX.AvailabilityElement
-SDMX.TimeElement
+SDMXer.SDMXElement
+SDMXer.DimensionElement
+SDMXer.AttributeElement
+SDMXer.MeasureElement
+SDMXer.ConceptElement
+SDMXer.CodelistElement
+SDMXer.AvailabilityElement
+SDMXer.TimeElement
 ```
 
 ## Extraction Functions
 
 ```@docs
-SDMX.extract_sdmx_element
-SDMX.extract_generic_element
-SDMX.extract_code_info
-SDMX.get_xpath_patterns
+SDMXer.extract_sdmx_element
+SDMXer.extract_generic_element
+SDMXer.extract_code_info
+SDMXer.get_xpath_patterns
 ```
 
 ## Demonstrations
 
 ```@docs
-SDMX.demonstrate_generated_parsing
-SDMX.create_benchmark_xml
-SDMX.migration_guide
+SDMXer.demonstrate_generated_parsing
+SDMXer.create_benchmark_xml
+SDMXer.migration_guide
 ```

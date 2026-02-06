@@ -1,9 +1,9 @@
 """
-SDMX.jl - A Julia package for reading and parsing SDMX structural metadata into handy structures (e.g., DataFrames).
+SDMXer.jl - A Julia package for reading and parsing SDMX structural metadata into handy structures (e.g., DataFrames).
 
 This package provides utilities to extract codelists and codes from SDMX-ML XML documents, making it easy to work with SDMX metadata in Julia.
 """
-module SDMX
+module SDMXer
 
 using EzXML, DataFrames, HTTP, CSV, Statistics, Dates, JSON3, StatsBase
 
@@ -24,7 +24,7 @@ include("SDMXHelpers.jl")
 # === CORE DATA STRUCTURES ===
 # Primary types for SDMX schema, data profiling, validation, and availability analysis
 export DataflowSchema
-export AvailabilityConstraint, DimensionAvailability, TimeAvailability  
+export AvailabilityConstraint, DimensionAvailability, TimeAvailability
 export ValidationResult, ValidationRule, ValidationSeverity, SDMXValidator
 
 # === GENERATED FUNCTION TYPES & PARSING ===
@@ -74,4 +74,4 @@ export ⊆, ⇒
 # Helper functions for URL handling and XML processing
 export is_url, normalize_sdmx_url, fetch_sdmx_xml
 
-end # module SDMX 
+end # module SDMXer

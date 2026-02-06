@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using DataFrames
 
 @testset "Validation System" begin
@@ -35,7 +35,7 @@ using DataFrames
         df = copy(compliant_df)
         df.OBS_VALUE = string.(df.OBS_VALUE) # Wrong type
         result = validator(df)
-        @test any(issue -> issue.rule_id == "column_types" && issue.severity == SDMX.ERROR, result.issues)
+        @test any(issue -> issue.rule_id == "column_types" && issue.severity == SDMXer.ERROR, result.issues)
     end
 
     @testset "Rule: codelist_compliance" begin

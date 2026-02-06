@@ -1,5 +1,5 @@
 """
-SDMX Data Query Functions for SDMX.jl
+SDMX Data Query Functions for SDMXer.jl
 
 This module provides functional approaches to construct and execute SDMX data queries,
 retrieving actual statistical data (as opposed to structural metadata).
@@ -258,7 +258,7 @@ function fetch_sdmx_data(url::String; timeout::Int=30)
     # Set SDMX-CSV headers
     headers = Dict(
         "Accept" => "application/vnd.sdmx.data+csv;version=2.0.0",
-        "User-Agent" => "SDMX.jl/0.1.0"
+        "User-Agent" => "SDMXer.jl/0.1.0"
     )
     
     try

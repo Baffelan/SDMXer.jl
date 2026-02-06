@@ -1,5 +1,5 @@
 """
-General helper functions for SDMX.jl
+General helper functions for SDMXer.jl
 """
 
 

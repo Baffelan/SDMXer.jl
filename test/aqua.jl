@@ -1,4 +1,4 @@
 using Aqua
-using SDMX
+using SDMXer
 
-Aqua.test_all(SDMX)
+Aqua.test_all(SDMXer)

@@ -5,17 +5,17 @@ Functions for validating data against SDMX schemas and standards.
 ## Main Functions
 
 ```@docs
-SDMX.create_validator
-SDMX.validate_sdmx_csv
-SDMX.generate_validation_report
-SDMX.preview_validation_output
+SDMXer.create_validator
+SDMXer.validate_sdmx_csv
+SDMXer.generate_validation_report
+SDMXer.preview_validation_output
 ```
 
 ## Types
 
 ```@docs
-SDMX.ValidationResult
-SDMX.ValidationRule
-SDMX.ValidationSeverity
-SDMX.SDMXValidator
+SDMXer.ValidationResult
+SDMXer.ValidationRule
+SDMXer.ValidationSeverity
+SDMXer.SDMXValidator
 ```

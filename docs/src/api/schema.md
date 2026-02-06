@@ -5,21 +5,21 @@ Functions for extracting and analyzing SDMX dataflow schemas and metadata.
 ## Main Functions
 
 ```@docs
-SDMX.extract_dataflow_schema
-SDMX.extract_concepts
+SDMXer.extract_dataflow_schema
+SDMXer.extract_concepts
 ```
 
 ## Schema Inspection
 
 ```@docs
-SDMX.get_required_columns
-SDMX.get_optional_columns
-SDMX.get_codelist_columns
-SDMX.get_dimension_order
+SDMXer.get_required_columns
+SDMXer.get_optional_columns
+SDMXer.get_codelist_columns
+SDMXer.get_dimension_order
 ```
 
 ## Types
 
 ```@docs
-SDMX.DataflowSchema
+SDMXer.DataflowSchema
 ```

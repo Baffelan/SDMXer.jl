@@ -93,7 +93,7 @@ struct MeasureElement <: SDMXElement end
 
 Type representing SDMX concept elements for specialized parsing.
 
-Concepts define the semantic meaning of dimensions, attributes, and measures in SDMX.
+Concepts define the semantic meaning of dimensions, attributes, and measures in SDMXer.
 This type enables compile-time generation of optimized parsing code for concept
 structures including names, descriptions, and classifications.
 

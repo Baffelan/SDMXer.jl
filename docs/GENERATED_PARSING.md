@@ -1,6 +1,6 @@
 # Generated Function SDMX Parsing
 
-This document describes the high-performance generated function parsing system in SDMX.jl, which provides compile-time optimized extraction of SDMX elements.
+This document describes the high-performance generated function parsing system in SDMXer.jl, which provides compile-time optimized extraction of SDMX elements.
 
 ## Overview
 
@@ -74,7 +74,7 @@ dim_data = extract_sdmx_element(DimensionElement, dim_node)
 ### Step 2: Import Required Types
 
 ```julia
-using SDMX: DimensionElement, AttributeElement, MeasureElement,
+using SDMXer: DimensionElement, AttributeElement, MeasureElement,
            ConceptElement, CodelistElement, extract_sdmx_element
 ```
 
@@ -96,7 +96,7 @@ attributes = [extract_sdmx_element(AttributeElement, node)
 ### Complete Workflow Example
 
 ```julia
-using SDMX
+using SDMXer
 using EzXML
 
 # Load SDMX document
@@ -237,5 +237,5 @@ To add support for new SDMX element types:
 
 ## See Also
 
-- [SDMX.jl Main Documentation](../README.md)
+- [SDMXer.jl Main Documentation](../README.md)
 - [SDMX 2.1 Technical Specification](https://sdmx.org/)

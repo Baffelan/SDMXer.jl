@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using DataFrames
 
 @testset "Pipeline Operations" begin
@@ -47,10 +47,10 @@ using DataFrames
     end
     
     @testset "⇒ (Validation Operator)" begin
-        validator = SDMX.create_validator(schema)
+        validator = SDMXer.create_validator(schema)
         result = compliant_df ⇒ validator
         
-        @test result isa SDMX.ValidationResult
+        @test result isa SDMXer.ValidationResult
         @test result.compliance_status in ["compliant", "minor_issues"]
         
         # Test with non-compliant data
@@ -59,16 +59,16 @@ using DataFrames
     end
     
     @testset "validate_with" begin
-        validate_func = SDMX.validate_with(schema)
+        validate_func = SDMXer.validate_with(schema)
         result = compliant_df |> validate_func
         
-        @test result isa SDMX.ValidationResult
+        @test result isa SDMXer.ValidationResult
         @test result.compliance_status in ["compliant", "minor_issues"]
         
         # Test with kwargs
-        validate_strict = SDMX.validate_with(schema; strict_mode=true)
+        validate_strict = SDMXer.validate_with(schema; strict_mode=true)
         result_strict = compliant_df |> validate_strict
-        @test result_strict isa SDMX.ValidationResult
+        @test result_strict isa SDMXer.ValidationResult
     end
 
     # Note: profile_with functionality has been moved to SDMXLLM.jl
@@ -177,12 +177,12 @@ using DataFrames
     
     @testset "SDMXPipeline and pipeline" begin
         # Create a reusable pipeline
-        my_pipeline = SDMX.pipeline(
+        my_pipeline = SDMXer.pipeline(
             df -> select(df, :FREQ, :TIME_PERIOD, :OBS_VALUE),
             df -> filter(row -> row.FREQ == "A", df)
         )
         
-        @test my_pipeline isa SDMX.SDMXPipeline
+        @test my_pipeline isa SDMXer.SDMXPipeline
         @test length(my_pipeline.operations) == 2
         
         # Test applying pipeline with |>
@@ -196,19 +196,19 @@ using DataFrames
         @test names(result_large) == ["FREQ", "TIME_PERIOD", "OBS_VALUE"]
         
         # Test empty pipeline
-        empty_pipeline = SDMX.pipeline()
+        empty_pipeline = SDMXer.pipeline()
         result_empty = compliant_df |> empty_pipeline
         @test result_empty === compliant_df
         
         # Test pipeline with validation
-        validation_pipeline = SDMX.pipeline(
+        validation_pipeline = SDMXer.pipeline(
             tap(df -> @test nrow(df) > 0),
-            SDMX.validate_with(schema),
-            tap(result -> @test result isa SDMX.ValidationResult)
+            SDMXer.validate_with(schema),
+            tap(result -> @test result isa SDMXer.ValidationResult)
         )
         
         validation_result = compliant_df |> validation_pipeline
-        @test validation_result isa SDMX.ValidationResult
+        @test validation_result isa SDMXer.ValidationResult
     end
     
     @testset "parallel_map" begin
@@ -216,28 +216,28 @@ using DataFrames
         datasets = [compliant_df, compliant_df, compliant_df]
         
         # Test parallel validation
-        validators = datasets |> SDMX.parallel_map(validate_with(schema))
+        validators = datasets |> SDMXer.parallel_map(validate_with(schema))
         @test length(validators) == 3
-        @test all(v -> v isa SDMX.ValidationResult, validators)
+        @test all(v -> v isa SDMXer.ValidationResult, validators)
         
         # Test parallel transformation
         transform_func = df -> select(df, :FREQ, :TIME_PERIOD)
-        transformed = datasets |> SDMX.parallel_map(transform_func)
+        transformed = datasets |> SDMXer.parallel_map(transform_func)
         @test length(transformed) == 3
         @test all(df -> names(df) == ["FREQ", "TIME_PERIOD"], transformed)
         
         # Test with empty collection
-        empty_results = [] |> SDMX.parallel_map(validate_with(schema))
+        empty_results = [] |> SDMXer.parallel_map(validate_with(schema))
         @test isempty(empty_results)
         
         # Test with single element
-        single_result = [compliant_df] |> SDMX.parallel_map(df -> nrow(df))
+        single_result = [compliant_df] |> SDMXer.parallel_map(df -> nrow(df))
         @test single_result == [1]
         
         # Test parallel validation
-        validator = SDMX.create_validator(schema)
+        validator = SDMXer.create_validator(schema)
         validation_results = [compliant_df, non_compliant_df] |> 
-            SDMX.parallel_map(df -> df ⇒ validator)
+            SDMXer.parallel_map(df -> df ⇒ validator)
         @test length(validation_results) == 2
         @test validation_results[1].compliance_status in ["compliant", "minor_issues"]
         @test validation_results[2].compliance_status != "compliant"
@@ -245,38 +245,38 @@ using DataFrames
     
     @testset "Complex pipeline compositions" begin
         # Test combining multiple pipeline features
-        complex_pipeline = SDMX.pipeline(
+        complex_pipeline = SDMXer.pipeline(
             tap(df -> @test "FREQ" in names(df)),
             branch(
                 df -> nrow(df) > 50,
                 chain(
                     df -> select(df, :FREQ, :TIME_PERIOD, :OBS_VALUE),
-                    SDMX.validate_with(schema; performance_mode=true)
+                    SDMXer.validate_with(schema; performance_mode=true)
                 ),
                 chain(
-                    SDMX.validate_with(schema),
-                    tap(r -> @test r isa SDMX.ValidationResult)
+                    SDMXer.validate_with(schema),
+                    tap(r -> @test r isa SDMXer.ValidationResult)
                 )
             )
         )
         
         # Small dataset should go through validation branch
         result_small = compliant_df |> complex_pipeline
-        @test result_small isa SDMX.ValidationResult
+        @test result_small isa SDMXer.ValidationResult
         
         # Large dataset should go through performance validation branch  
         result_large = large_df |> complex_pipeline
-        @test result_large isa SDMX.ValidationResult
+        @test result_large isa SDMXer.ValidationResult
         
         # Test pipeline with all operators
         full_pipeline = chain(
             tap(df -> @test df ⊆ schema),
-            SDMX.validate_with(schema),
-            tap(result -> @test result isa SDMX.ValidationResult)
+            SDMXer.validate_with(schema),
+            tap(result -> @test result isa SDMXer.ValidationResult)
         )
         
         final_result = compliant_df |> full_pipeline
-        @test final_result isa SDMX.ValidationResult
+        @test final_result isa SDMXer.ValidationResult
     end
     
     @testset "Edge cases and error handling" begin
@@ -286,8 +286,8 @@ using DataFrames
         df_with_missing.OBS_VALUE[1] = missing
         
         # Test validation with missing values
-        validation_missing = df_with_missing |> SDMX.validate_with(schema)
-        @test validation_missing isa SDMX.ValidationResult
+        validation_missing = df_with_missing |> SDMXer.validate_with(schema)
+        @test validation_missing isa SDMXer.ValidationResult
         
         # Test branch with error in condition
         error_branch = branch(

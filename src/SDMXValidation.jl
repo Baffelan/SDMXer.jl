@@ -1,5 +1,5 @@
 """
-SDMX-CSV Validation System for SDMX.jl
+SDMX-CSV Validation System for SDMXer.jl
 
 This module provides comprehensive validation for SDMX-CSV files, ensuring they:
 - Conform to SDMX-CSV structural requirements

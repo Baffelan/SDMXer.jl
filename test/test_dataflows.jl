@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using DataFrames
 
 # Note: fixture_path is defined in the main runtests.jl

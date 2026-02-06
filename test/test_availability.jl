@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using Dates
 using EzXML
 
@@ -28,7 +28,7 @@ using EzXML
     
     @testset "TimeAvailability struct" begin
         # Test creating TimeAvailability with Date objects
-        time_avail = SDMX.TimeAvailability(
+        time_avail = SDMXer.TimeAvailability(
             Date("2020-01-01"),
             Date("2023-12-31"),
             "year",
@@ -42,7 +42,7 @@ using EzXML
         @test "2021" in time_avail.gaps
         
         # Test creating TimeAvailability with String dates
-        time_avail_str = SDMX.TimeAvailability(
+        time_avail_str = SDMXer.TimeAvailability(
             "2020Q1",
             "2023Q4",
             "quarter",
@@ -55,7 +55,7 @@ using EzXML
     end
     
     @testset "DimensionAvailability struct" begin
-        dim_avail = SDMX.DimensionAvailability(
+        dim_avail = SDMXer.DimensionAvailability(
             "COUNTRY",
             ["FJ", "TO", "WS"],
             3,
@@ -75,7 +75,7 @@ using EzXML
         doc = readxml(spc_file)
         
         # Try to extract availability from dataflow (might return nothing)
-        result = SDMX.extract_availability_from_dataflow(doc)
+        result = SDMXer.extract_availability_from_dataflow(doc)
         
         # This is okay - not all dataflows have Actual ContentConstraints
         if result !== nothing
@@ -97,7 +97,7 @@ using EzXML
         @test constraint_node !== nothing
         
         # Extract availability from the node
-        availability = SDMX.extract_availability_from_node(constraint_node)
+        availability = SDMXer.extract_availability_from_node(constraint_node)
         @test availability isa AvailabilityConstraint
         @test !isempty(availability.constraint_id)
         @test !isempty(availability.dimensions)
@@ -116,7 +116,7 @@ using EzXML
         doc = parsexml(xml_str)
         time_node = root(doc)
         
-        time_avail = SDMX.extract_time_availability(time_node)
+        time_avail = SDMXer.extract_time_availability(time_node)
         @test time_avail isa TimeAvailability
         @test time_avail.start_date == Date("2020-01-01")
         @test time_avail.end_date == Date("2023-12-31")
@@ -135,7 +135,7 @@ using EzXML
         doc_discrete = parsexml(xml_str_discrete)
         time_node_discrete = root(doc_discrete)
         
-        time_avail_discrete = SDMX.extract_time_availability(time_node_discrete)
+        time_avail_discrete = SDMXer.extract_time_availability(time_node_discrete)
         @test time_avail_discrete.start_date == "2020"
         @test time_avail_discrete.end_date == "2023"
         @test time_avail_discrete.format == "discrete"
@@ -155,7 +155,7 @@ using EzXML
         doc_range = parsexml(xml_str_range)
         time_node_range = root(doc_range)
         
-        values_range = SDMX.get_time_period_values(time_node_range)
+        values_range = SDMXer.get_time_period_values(time_node_range)
         @test length(values_range) == 1
         @test values_range[1] == "2020-2023"
         
@@ -170,7 +170,7 @@ using EzXML
         doc_discrete = parsexml(xml_str_discrete)
         time_node_discrete = root(doc_discrete)
         
-        values_discrete = SDMX.get_time_period_values(time_node_discrete)
+        values_discrete = SDMXer.get_time_period_values(time_node_discrete)
         @test length(values_discrete) == 3
         @test "2020" in values_discrete
         @test "2021" in values_discrete
@@ -189,7 +189,7 @@ using EzXML
         doc = parsexml(xml_str)
         kv_node = root(doc)
         
-        values = SDMX.extract_dimension_values(kv_node)
+        values = SDMXer.extract_dimension_values(kv_node)
         @test length(values) == 4
         @test "FJ" in values
         @test "TO" in values
@@ -201,12 +201,12 @@ using EzXML
     @testset "get_available_values" begin
         # Create a mock AvailabilityConstraint
         dims = [
-            SDMX.DimensionAvailability("COUNTRY", ["FJ", "TO", "WS"], 3, "codelist", 1.0),
-            SDMX.DimensionAvailability("INDICATOR", ["GDP", "POP", "UNEMP"], 3, "codelist", 1.0),
-            SDMX.DimensionAvailability("TIME_PERIOD", ["2020", "2021", "2022"], 3, "time", 1.0)
+            SDMXer.DimensionAvailability("COUNTRY", ["FJ", "TO", "WS"], 3, "codelist", 1.0),
+            SDMXer.DimensionAvailability("INDICATOR", ["GDP", "POP", "UNEMP"], 3, "codelist", 1.0),
+            SDMXer.DimensionAvailability("TIME_PERIOD", ["2020", "2021", "2022"], 3, "time", 1.0)
         ]
         
-        availability = SDMX.AvailabilityConstraint(
+        availability = SDMXer.AvailabilityConstraint(
             "TEST_CC",
             "Test Constraint",
             "TEST_AGENCY",
@@ -240,7 +240,7 @@ using EzXML
         doc = parsexml(invalid_xml)
         
         # Should throw error because no ContentConstraint is found (could be ArgumentError or XMLError)
-        @test_throws Union{ArgumentError, EzXML.XMLError} SDMX.extract_availability(doc)
+        @test_throws Union{ArgumentError, EzXML.XMLError} SDMXer.extract_availability(doc)
     end
     
     @testset "Edge cases" begin
@@ -265,7 +265,7 @@ using EzXML
         doc = parsexml(xml_str)
         constraint_node = root(doc)
         
-        availability = SDMX.extract_availability_from_node(constraint_node)
+        availability = SDMXer.extract_availability_from_node(constraint_node)
         @test availability.total_observations == 0  # Should default to 0
         @test availability.constraint_id == "CC_NO_OBS"
         @test length(availability.dimensions) == 1
@@ -292,8 +292,8 @@ using EzXML
         constraint_node_invalid = root(doc_invalid)
         
         # Should warn and default to 0
-        @test_logs (:warn,) SDMX.extract_availability_from_node(constraint_node_invalid)
-        availability_invalid = SDMX.extract_availability_from_node(constraint_node_invalid)
+        @test_logs (:warn,) SDMXer.extract_availability_from_node(constraint_node_invalid)
+        availability_invalid = SDMXer.extract_availability_from_node(constraint_node_invalid)
         @test availability_invalid.total_observations == 0
     end
 

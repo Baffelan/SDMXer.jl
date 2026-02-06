@@ -1,5 +1,5 @@
 using Test
-using SDMX
+using SDMXer
 using EzXML
 using DataFrames
 
@@ -7,7 +7,7 @@ using DataFrames
     
     @testset "demonstrate_generated_parsing" begin
         # Test that the demonstration function runs without errors (silently)
-        @test_nowarn SDMX.demonstrate_generated_parsing(verbose=false)
+        @test_nowarn SDMXer.demonstrate_generated_parsing(verbose=false)
         
         # Just verify it doesn't throw an error
         # Full documentation is available in docs/GENERATED_PARSING.md
@@ -15,7 +15,7 @@ using DataFrames
     
     @testset "migration_guide" begin
         # Test that the migration guide runs without errors (silently)
-        @test_nowarn SDMX.migration_guide(verbose=false)
+        @test_nowarn SDMXer.migration_guide(verbose=false)
         
         # Just verify it doesn't throw an error
         # Full documentation is available in docs/GENERATED_PARSING.md
@@ -23,7 +23,7 @@ using DataFrames
     
     @testset "create_benchmark_xml" begin
         # Test the helper function that creates benchmark XML
-        xml_content = SDMX.create_benchmark_xml()
+        xml_content = SDMXer.create_benchmark_xml()
         @test !isempty(xml_content)
         @test occursin("<?xml version", xml_content)
         @test occursin("structure:DataStructure", xml_content)
@@ -70,9 +70,9 @@ using DataFrames
         @test length(measures) > 0
         
         # Extract using generated functions
-        dim_results = [SDMX.extract_sdmx_element(SDMX.DimensionElement, d) for d in dimensions[1:min(3, length(dimensions))]]
-        attr_results = [SDMX.extract_sdmx_element(SDMX.AttributeElement, a) for a in attributes[1:min(3, length(attributes))]]
-        measure_results = [SDMX.extract_sdmx_element(SDMX.MeasureElement, m) for m in measures]
+        dim_results = [SDMXer.extract_sdmx_element(SDMXer.DimensionElement, d) for d in dimensions[1:min(3, length(dimensions))]]
+        attr_results = [SDMXer.extract_sdmx_element(SDMXer.AttributeElement, a) for a in attributes[1:min(3, length(attributes))]]
+        measure_results = [SDMXer.extract_sdmx_element(SDMXer.MeasureElement, m) for m in measures]
         
         # Verify results
         @test all(r -> !ismissing(r.dimension_id), dim_results)
@@ -97,7 +97,7 @@ using DataFrames
         # Extract first few codelists
         codelist_data = []
         for cl in codelists[1:min(3, length(codelists))]
-            result = SDMX.extract_sdmx_element(SDMX.CodelistElement, cl)
+            result = SDMXer.extract_sdmx_element(SDMXer.CodelistElement, cl)
             push!(codelist_data, result)
         end
         
@@ -110,7 +110,7 @@ using DataFrames
         
         concept_data = []
         for c in concepts[1:min(5, length(concepts))]
-            result = SDMX.extract_sdmx_element(SDMX.ConceptElement, c)
+            result = SDMXer.extract_sdmx_element(SDMXer.ConceptElement, c)
             push!(concept_data, result)
         end
         
@@ -126,7 +126,7 @@ using DataFrames
         time_dim_nodes = findall(".//structure:TimeDimension", dsd_node)
         all_dims = vcat(dim_nodes, time_dim_nodes)
         
-        dim_data = [SDMX.extract_sdmx_element(SDMX.DimensionElement, d) for d in all_dims]
+        dim_data = [SDMXer.extract_sdmx_element(SDMXer.DimensionElement, d) for d in all_dims]
         @test length(dim_data) > 0
         @test all(d -> !ismissing(d.dimension_id), dim_data)
         
@@ -144,7 +144,7 @@ using DataFrames
         root_node = root(doc)
         
         # Get XPath patterns for dimensions
-        dim_patterns = SDMX.get_xpath_patterns(SDMX.DimensionElement)
+        dim_patterns = SDMXer.get_xpath_patterns(SDMXer.DimensionElement)
         
         # Find a dimension and use the patterns
         dim_node = findfirst("//structure:Dimension[@id='FREQ']", root_node)
@@ -160,7 +160,7 @@ using DataFrames
         @test codelist_ref["id"] == "CL_COM_FREQ"
         
         # Test attribute XPath patterns
-        attr_patterns = SDMX.get_xpath_patterns(SDMX.AttributeElement)
+        attr_patterns = SDMXer.get_xpath_patterns(SDMXer.AttributeElement)
         attr_node = findfirst("//structure:Attribute[@id='UNIT_MEASURE']", root_node)
         @test attr_node !== nothing
         
@@ -183,27 +183,27 @@ using DataFrames
         
         # Extract dimensions
         for dim in findall("//structure:DataStructure[@id='DSD_BP50']//structure:Dimension", root_node)[1:2]
-            data = SDMX.extract_sdmx_element(SDMX.DimensionElement, dim)
+            data = SDMXer.extract_sdmx_element(SDMXer.DimensionElement, dim)
             push!(results, ("Dimension", data.dimension_id, data.position))
         end
         
         # Extract time dimension
         time_dim = findfirst("//structure:TimeDimension", root_node)
         if time_dim !== nothing
-            data = SDMX.extract_sdmx_element(SDMX.DimensionElement, time_dim)
+            data = SDMXer.extract_sdmx_element(SDMXer.DimensionElement, time_dim)
             push!(results, ("TimeDimension", data.dimension_id, data.position))
         end
         
         # Extract attributes
         for attr in findall("//structure:Attribute", root_node)[1:2]
-            data = SDMX.extract_sdmx_element(SDMX.AttributeElement, attr)
+            data = SDMXer.extract_sdmx_element(SDMXer.AttributeElement, attr)
             push!(results, ("Attribute", data.attribute_id, data.assignment_status))
         end
         
         # Extract measure (only those with id attribute)
         measure = findfirst("//structure:PrimaryMeasure[@id]", root_node)
         if measure !== nothing
-            data = SDMX.extract_sdmx_element(SDMX.MeasureElement, measure)
+            data = SDMXer.extract_sdmx_element(SDMXer.MeasureElement, measure)
             push!(results, ("Measure", data.measure_id, data.data_type))
         end
         
@@ -223,7 +223,7 @@ using DataFrames
         doc = parsexml(minimal_xml)
         node = root(doc)
         
-        result = SDMX.extract_sdmx_element(SDMX.DimensionElement, node)
+        result = SDMXer.extract_sdmx_element(SDMXer.DimensionElement, node)
         @test result.dimension_id == "TEST"
         @test result.position == 1
         @test ismissing(result.concept_id)
@@ -238,7 +238,7 @@ using DataFrames
         doc = parsexml(category_xml)
         node = root(doc)
         
-        result = SDMX.extract_generic_element(node)
+        result = SDMXer.extract_generic_element(node)
         @test result.element_id == "CAT1"
         @test result.element_name == "Category"
     end

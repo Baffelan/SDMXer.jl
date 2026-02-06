@@ -1,5 +1,5 @@
 """
-Julia-idiomatic Pipeline Operators for SDMX.jl
+Julia-idiomatic Pipeline Operators for SDMXer.jl
 
 This module defines custom operators and pipeline functions for smooth workflow chaining,
 leveraging Julia's operator overloading and method dispatch capabilities.

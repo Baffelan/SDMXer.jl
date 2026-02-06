@@ -1,7 +1,7 @@
-# SDMX.jl
+# SDMXer.jl
 
-[![Build Status](https://github.com/Baffelan/SDMX.jl/workflows/CI/badge.svg)](https://github.com/Baffelan/SDMX.jl/actions/workflows/CI.yml)
-[![Coverage](https://codecov.io/gh/Baffelan/SDMX.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Baffelan/SDMX.jl)
+[![Build Status](https://github.com/Baffelan/SDMXer.jl/workflows/CI/badge.svg)](https://github.com/Baffelan/SDMXer.jl/actions/workflows/CI.yml)
+[![Coverage](https://codecov.io/gh/Baffelan/SDMXer.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Baffelan/SDMXer.jl)
 [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
@@ -11,13 +11,13 @@ Core Julia package for SDMX (Statistical Data and Metadata eXchange) processing.
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/Baffelan/SDMX.jl")
+Pkg.add(url="https://github.com/Baffelan/SDMXer.jl")
 ```
 
 ## Quick Start
 
 ```julia
-using SDMX, DataFrames, CSV
+using SDMXer, DataFrames, CSV
 
 # 1. Extract SDMX schema
 url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50/latest?references=all"
@@ -129,7 +129,7 @@ conforms = data ⊆ schema      # Conformance check
 ## Working with Pacific Data Hub
 
 ```julia
-using SDMX, DataFrames, CSV
+using SDMXer, DataFrames, CSV
 
 # Complete workflow example
 base_url = "https://stats-sdmx-disseminate.pacificdata.org/rest/"
@@ -195,7 +195,7 @@ result = validate_sdmx_csv(validator, "pacific_trade.csv")
 
 ```julia
 using Pkg
-Pkg.test("SDMX")
+Pkg.test("SDMXer")
 ```
 
 ## Documentation
@@ -205,7 +205,7 @@ Pkg.test("SDMX")
 
 ## See Also
 
-- [SDMXLLM.jl](https://github.com/Baffelan/SDMXLLM.jl) - LLM-powered extension
+- [SDMXerWizard.jl](https://github.com/Baffelan/SDMXerWizard.jl) - LLM-powered extension
 - [SDMX.org](https://sdmx.org) - Official SDMX documentation
 - [PDH .Stat](https://stats.pacificdata.org) - Pacific Data Hub
 

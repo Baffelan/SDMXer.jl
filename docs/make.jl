@@ -1,14 +1,14 @@
 using Documenter
-using SDMX
+using SDMXer
 
 makedocs(
-    sitename = "SDMX.jl",
+    sitename = "SDMXer.jl",
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
-        canonical = "https://baffelan.github.io/SDMX.jl",
+        canonical = "https://baffelan.github.io/SDMXer.jl",
         assets = String[],
     ),
-    modules = [SDMX],
+    modules = [SDMXer],
     pages = [
         "Home" => "index.md",
         "Getting Started" => "getting_started.md",
@@ -28,6 +28,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/Baffelan/SDMX.jl.git",
+    repo = "github.com/Baffelan/SDMXer.jl.git",
     devbranch = "main",
 )

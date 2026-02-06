@@ -1,5 +1,5 @@
 """
-SDMX Availability Constraint extraction for SDMX.jl
+SDMX Availability Constraint extraction for SDMXer.jl
 
 This module extracts actual data availability information from SDMX availability constraints,
 showing which dimension values actually have published data (vs. theoretical schema possibilities).
@@ -123,7 +123,7 @@ end
 """
     AvailabilityConstraint
 
-Complete availability constraint information from SDMX.
+Complete availability constraint information from SDMXer.
 """
 struct AvailabilityConstraint
     constraint_id::String
