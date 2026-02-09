@@ -50,4 +50,19 @@ fixture_path(filename) = joinpath(@__DIR__, "fixtures", filename)
     @testset "LLM" begin
         include("test_llm.jl")
     end
+    @testset "Units" begin
+        include("test_units.jl")
+    end
+    @testset "Schema Comparison" begin
+        include("test_schema_comparison.jl")
+    end
+    @testset "Unit Conflicts" begin
+        include("test_unit_conflicts.jl")
+    end
+    @testset "Frequency Alignment" begin
+        include("test_frequency_alignment.jl")
+    end
+    @testset "Cross-Dataflow Join" begin
+        include("test_join.jl")
+    end
 end

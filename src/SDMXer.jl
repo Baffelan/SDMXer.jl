@@ -5,7 +5,7 @@ This package provides utilities to extract codelists and codes from SDMX-ML XML 
 """
 module SDMXer
 
-using EzXML, DataFrames, HTTP, CSV, Statistics, Dates, JSON3, StatsBase
+using EzXML, DataFrames, HTTP, CSV, Statistics, Dates, JSON3, StatsBase, Unitful
 
 include("SDMXElementTypes.jl")
 include("SDMXGeneratedParsing.jl")
@@ -18,6 +18,11 @@ include("SDMXValidation.jl")
 include("SDMXPipelineOps.jl")
 include("SDMXDataQueries.jl")
 include("SDMXHelpers.jl")
+include("SDMXUnits.jl")
+include("SDMXSchemaComparison.jl")
+include("SDMXUnitConflicts.jl")
+include("SDMXFrequencyAlignment.jl")
+include("SDMXJoin.jl")
 
 # Note: Data source abstractions moved to SDMXLLM.jl package
 
@@ -73,5 +78,31 @@ export ⊆, ⇒
 # === UTILITY FUNCTIONS ===
 # Helper functions for URL handling and XML processing
 export is_url, normalize_sdmx_url, fetch_sdmx_xml
+
+# === UNITS & CONVERSION ===
+# Unitful integration, SDMX unit code mappings, and exchange rates
+export SDMXUnitSpec, ExchangeRateTable, SDMX_UNIT_MAP
+export sdmx_to_unitful, are_units_convertible, conversion_factor, unit_multiplier
+export add_rate!, get_rate, convert_currency, default_exchange_rates
+
+# === SCHEMA COMPARISON ===
+# Comparing DataflowSchema objects for cross-dataflow analysis
+export CodelistOverlap, SchemaComparison
+export codelist_overlap, compare_schemas
+
+# === UNIT CONFLICTS & HARMONIZATION ===
+# Detecting and resolving unit mismatches across dataflows
+export UnitConflict, UnitConflictReport
+export detect_unit_conflicts, normalize_units!, harmonize_units
+
+# === FREQUENCY ALIGNMENT ===
+# Aligning time-series data across different frequencies
+export FrequencyAlignment
+export align_frequencies
+
+# === CROSS-DATAFLOW JOIN ===
+# Intelligent joining of SDMX DataFrames from different dataflows
+export JoinResult
+export detect_join_columns, sdmx_join
 
 end # module SDMXer
