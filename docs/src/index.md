@@ -1,11 +1,11 @@
 # SDMXer.jl Documentation
 
 ```@meta
-CurrentModule = SDMX
+CurrentModule = SDMXer
 ```
 
 ```@docs
-SDMX.SDMX
+SDMXer.SDMXer
 ```
 
 Core Julia package for SDMX (Statistical Data and Metadata eXchange) processing. Extract and analyze structural metadata from SDMX-ML documents.

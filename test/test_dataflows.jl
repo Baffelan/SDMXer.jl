@@ -54,7 +54,7 @@ using DataFrames
     end
 
     @testset "Dataflow URL Preservation" begin
-        url = "https://stats-sdmx-disseminate.pacificdata.org/rest/datastructure/SPC/DF_BP50"
+        url = "https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/DF_BP50"
         schema = extract_dataflow_schema(url)
         @test hasproperty(schema.dataflow_info, :url)
         @test schema.dataflow_info.url == SDMXer.normalize_sdmx_url(url)
