@@ -53,6 +53,13 @@ using DataFrames
         @test haskey(codelist_cols, "INDICATOR")
     end
 
+    @testset "Dataflow URL Preservation" begin
+        url = "https://stats-sdmx-disseminate.pacificdata.org/rest/datastructure/SPC/DF_BP50"
+        schema = extract_dataflow_schema(url)
+        @test hasproperty(schema.dataflow_info, :url)
+        @test schema.dataflow_info.url == SDMXer.normalize_sdmx_url(url)
+    end
+
     # UNICEF, OECD, and Eurostat tests removed as fixtures are obsolete
 
 end

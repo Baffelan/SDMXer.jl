@@ -182,12 +182,14 @@ using DataFrames
         @test !isempty(dim_order)
         @test "FREQ" in dim_order
         @test "GEO_PICT" in dim_order
-        @test "TIME_PERIOD" in dim_order
-        
-        # Verify order matches the schema DataFrame order plus TIME_PERIOD
-        # get_dimension_order includes TIME_PERIOD, dimensions doesn't
-        expected_dims = vcat(spc_schema.dimensions.dimension_id, ["TIME_PERIOD"])
-        @test dim_order == expected_dims
+
+        # TIME_PERIOD must NOT appear in key dimensions (SDMX 2.1 REST spec:
+        # time filtering uses startPeriod/endPeriod query params, not key positions)
+        @test !("TIME_PERIOD" in dim_order)
+
+        # Order should match the regular dimensions sorted by position
+        sorted_dims = sort(spc_schema.dimensions, :position)
+        @test dim_order == collect(sorted_dims.dimension_id)
     end
     
     @testset "query_sdmx_data" begin

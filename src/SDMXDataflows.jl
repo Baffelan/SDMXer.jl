@@ -28,7 +28,7 @@ structure, dimension ordering, attribute requirements, and measure definitions.
 - `dimensions::DataFrame`: All dimensions with position ordering, concept references,
   and codelist information
 - `attributes::DataFrame`: All attributes with assignment status (required/conditional),
-  concept and codelist info  
+  concept and codelist info
 - `measures::DataFrame`: Primary measure definitions with concept references and data
   type specifications
 - `time_dimension::Union{NamedTuple, Nothing}`: Special time dimension information if present in the dataflow
@@ -82,7 +82,7 @@ for proper dimension handling in SDMX data processing.
 # Returns
 - `NamedTuple`: Dimension metadata with fields:
   - `id::String`: Dimension identifier
-  - `position::Int`: Position in dimension ordering  
+  - `position::Int`: Position in dimension ordering
   - `concept_id::Union{String, Missing}`: Referenced concept identifier
   - `concept_scheme::Union{String, Missing}`: Concept scheme reference
   - `codelist_id::Union{String, Missing}`: Associated codelist identifier
@@ -111,25 +111,25 @@ end
 function extract_dimension_info(dim_node::EzXML.Node)
     dim_id = dim_node["id"]
     position = parse(Int, dim_node["position"])
-    
+
     # Get concept reference
     concept_ref = findfirst(".//structure:ConceptIdentity/Ref", dim_node)
     concept_id = concept_ref !== nothing ? concept_ref["id"] : missing
     concept_scheme = concept_ref !== nothing && haskey(concept_ref, "maintainableParentID") ? concept_ref["maintainableParentID"] : missing
-    
+
     # Get codelist reference (if enumeration)
     codelist_ref = findfirst(".//structure:LocalRepresentation/structure:Enumeration/Ref", dim_node)
     codelist_id = codelist_ref !== nothing ? codelist_ref["id"] : missing
     codelist_agency = codelist_ref !== nothing ? codelist_ref["agencyID"] : missing
     codelist_version = codelist_ref !== nothing ? codelist_ref["version"] : missing
-    
+
     # Get text format (if non-enumerated)
     text_format = findfirst(".//structure:LocalRepresentation/structure:TextFormat", dim_node)
     data_type = text_format !== nothing && haskey(text_format, "textType") ? text_format["textType"] : missing
-    
+
     # Determine if this is a time dimension
     is_time_dimension = nodename(dim_node) == "TimeDimension"
-    
+
     return (
         dimension_id = dim_id,
         position = position,
@@ -191,22 +191,22 @@ end
 function extract_attribute_info(attr_node::EzXML.Node)
     attr_id = attr_node["id"]
     assignment_status = haskey(attr_node, "assignmentStatus") ? attr_node["assignmentStatus"] : "Mandatory"
-    
+
     # Get concept reference
     concept_ref = findfirst(".//structure:ConceptIdentity/Ref", attr_node)
     concept_id = concept_ref !== nothing ? concept_ref["id"] : missing
     concept_scheme = concept_ref !== nothing && haskey(concept_ref, "maintainableParentID") ? concept_ref["maintainableParentID"] : missing
-    
+
     # Get codelist reference (if enumeration)
     codelist_ref = findfirst(".//structure:LocalRepresentation/structure:Enumeration/Ref", attr_node)
     codelist_id = codelist_ref !== nothing ? codelist_ref["id"] : missing
     codelist_agency = codelist_ref !== nothing ? codelist_ref["agencyID"] : missing
     codelist_version = codelist_ref !== nothing ? codelist_ref["version"] : missing
-    
+
     # Get text format (if non-enumerated)
     text_format = findfirst(".//structure:LocalRepresentation/structure:TextFormat", attr_node)
     data_type = text_format !== nothing && haskey(text_format, "textType") ? text_format["textType"] : missing
-    
+
     # Get attribute relationship (what it attaches to)
     relationship = "Dataset"  # default
     if findfirst(".//structure:AttributeRelationship/structure:PrimaryMeasure", attr_node) !== nothing
@@ -214,7 +214,7 @@ function extract_attribute_info(attr_node::EzXML.Node)
     elseif findfirst(".//structure:AttributeRelationship/structure:Dimension", attr_node) !== nothing
         relationship = "Dimension"
     end
-    
+
     return (
         attribute_id = attr_id,
         assignment_status = assignment_status,
@@ -235,16 +235,16 @@ Extracts information from a PrimaryMeasure node.
 """
 function extract_measure_info(measure_node::EzXML.Node)
     measure_id = measure_node["id"]
-    
+
     # Get concept reference
     concept_ref = findfirst(".//structure:ConceptIdentity/Ref", measure_node)
     concept_id = concept_ref !== nothing ? concept_ref["id"] : missing
     concept_scheme = concept_ref !== nothing && haskey(concept_ref, "maintainableParentID") ? concept_ref["maintainableParentID"] : missing
-    
+
     # Get text format
     text_format = findfirst(".//structure:LocalRepresentation/structure:TextFormat", measure_node)
     data_type = text_format !== nothing && haskey(text_format, "textType") ? text_format["textType"] : "Double"
-    
+
     return (
         measure_id = measure_id,
         concept_id = concept_id,
@@ -266,13 +266,13 @@ Extracts complete dataflow schema information from an SDMX structure document.
 """
 function extract_dataflow_schema(doc::EzXML.Document)
     rootnode = root(doc)
-    
+
     # Extract dataflow basic information
     dataflow_node = findfirst("//structure:Dataflow", rootnode)
     if dataflow_node === nothing
         error("No dataflow found in document")
     end
-    
+
     dataflow_info = (
         id = dataflow_node["id"],
         agency = dataflow_node["agencyID"],
@@ -290,20 +290,20 @@ function extract_dataflow_schema(doc::EzXML.Document)
             dsd_ref !== nothing ? dsd_ref["id"] : missing
         end
     )
-    
+
     # Find the corresponding Data Structure Definition
     dsd_node = findfirst("//structure:DataStructure[@id='$(dataflow_info.dsd_id)']", rootnode)
     if dsd_node === nothing
         error("Data Structure Definition '$(dataflow_info.dsd_id)' not found")
     end
-    
+
     # Extract dimensions
     dimension_nodes = findall(".//structure:DimensionList/structure:Dimension", dsd_node)
     time_dim_nodes = findall(".//structure:DimensionList/structure:TimeDimension", dsd_node)
-    
+
     all_dim_nodes = vcat(dimension_nodes, time_dim_nodes)
     dimension_data = [extract_dimension_info(node) for node in all_dim_nodes]
-    
+
     # Separate time dimension if present
     time_dimension = nothing
     regular_dimensions = dimension_data
@@ -314,19 +314,19 @@ function extract_dataflow_schema(doc::EzXML.Document)
             regular_dimensions = filter(d -> !d.is_time_dimension, dimension_data)
         end
     end
-    
+
     dimensions_df = DataFrame(regular_dimensions)
-    
+
     # Extract attributes
     attribute_nodes = findall(".//structure:AttributeList/structure:Attribute", dsd_node)
     attribute_data = [extract_attribute_info(node) for node in attribute_nodes]
     attributes_df = DataFrame(attribute_data)
-    
+
     # Extract measures
     measure_nodes = findall(".//structure:MeasureList/structure:PrimaryMeasure", dsd_node)
     measure_data = [extract_measure_info(node) for node in measure_nodes]
     measures_df = DataFrame(measure_data)
-    
+
     return DataflowSchema(dataflow_info, dimensions_df, attributes_df, measures_df, time_dimension)
 end
 
@@ -374,7 +374,12 @@ function extract_dataflow_schema(input::String)
         # Use the robust URL handling from SDMXHelpers
         xml_string = fetch_sdmx_xml(input)
         doc = parsexml(xml_string)
-        return extract_dataflow_schema(doc)
+        schema = extract_dataflow_schema(doc)
+        if is_url(input)
+            dataflow_info = merge(schema.dataflow_info, (url=normalize_sdmx_url(input),))
+            return DataflowSchema(dataflow_info, schema.dimensions, schema.attributes, schema.measures, schema.time_dimension)
+        end
+        return schema
     catch e
         println("Error during HTTP request or parsing: ", e)
         rethrow(e)
@@ -389,22 +394,22 @@ This includes all dimensions, the primary measure, and mandatory attributes.
 """
 function get_required_columns(schema::DataflowSchema)
     required_cols = String[]
-    
+
     # All dimensions are required
     append!(required_cols, schema.dimensions.dimension_id)
-    
+
     # Time dimension if present
     if schema.time_dimension !== nothing
         push!(required_cols, schema.time_dimension.dimension_id)
     end
-    
+
     # Primary measure is required
     append!(required_cols, schema.measures.measure_id)
-    
+
     # Mandatory attributes
     mandatory_attrs = filter(row -> row.assignment_status == "Mandatory", schema.attributes)
     append!(required_cols, mandatory_attrs.attribute_id)
-    
+
     return required_cols
 end
 
@@ -427,7 +432,7 @@ Only includes columns that have associated codelists.
 """
 function get_codelist_columns(schema::DataflowSchema)
     codelist_cols = Dict{String, NamedTuple}()
-    
+
     # Check dimensions
     for row in eachrow(schema.dimensions)
         if !ismissing(row.codelist_id)
@@ -438,7 +443,7 @@ function get_codelist_columns(schema::DataflowSchema)
             )
         end
     end
-    
+
     # Check attributes
     for row in eachrow(schema.attributes)
         if !ismissing(row.codelist_id)
@@ -449,38 +454,20 @@ function get_codelist_columns(schema::DataflowSchema)
             )
         end
     end
-    
+
     return codelist_cols
 end
 
 """
     get_dimension_order(schema::DataflowSchema) -> Vector{String}
 
-Returns the ordered list of dimension IDs for constructing SDMX data query keys.
-Dimensions are ordered by their position, with the time dimension (if present) included.
+Returns the ordered list of regular dimension IDs for constructing SDMX data query keys.
+Dimensions are ordered by their position. The time dimension is excluded because
+per the SDMX 2.1 REST API spec it must be filtered via startPeriod/endPeriod query
+parameters, not as a key position.
 """
 function get_dimension_order(schema::DataflowSchema)
     # Sort dimensions by position
     sorted_dims = sort(schema.dimensions, :position)
-    dimension_ids = collect(sorted_dims.dimension_id)
-    
-    # Add time dimension if present (usually comes last but check position)
-    if schema.time_dimension !== nothing
-        # Insert time dimension at correct position if it has one
-        if haskey(schema.time_dimension, :position)
-            # Find correct insertion point
-            time_pos = schema.time_dimension.position
-            insert_idx = findlast(d -> d <= time_pos, sorted_dims.position)
-            if insert_idx === nothing
-                insert!(dimension_ids, 1, schema.time_dimension.dimension_id)
-            else
-                insert!(dimension_ids, insert_idx + 1, schema.time_dimension.dimension_id)
-            end
-        else
-            # Default to end if no position specified
-            push!(dimension_ids, schema.time_dimension.dimension_id)
-        end
-    end
-    
-    return dimension_ids
+    return collect(sorted_dims.dimension_id)
 end
