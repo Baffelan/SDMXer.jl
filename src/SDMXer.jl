@@ -1,7 +1,76 @@
 """
-SDMXer.jl - A Julia package for reading and parsing SDMX structural metadata into handy structures (e.g., DataFrames).
+    SDMXer
 
-This package provides utilities to extract codelists and codes from SDMX-ML XML documents, making it easy to work with SDMX metadata in Julia.
+Parse SDMX-ML structural metadata and data into Julia structures (DataFrames).
+
+# Workflow paths
+
+**Schema extraction**
+    extract_dataflow_schema  ─→  DataflowSchema
+                                   ├─→ compare_schemas  ─→  SchemaComparison
+                                   ├─→ create_validator ─→  validate_sdmx_csv ─→ generate_validation_report
+                                   └─→ query_sdmx_data  ─→  DataFrame
+
+**Codelist processing**
+    extract_all_codelists  ─→  DataFrame
+    filter_codelists_by_availability  ─→  filtered DataFrame
+
+**Data availability**
+    extract_availability  ─→  AvailabilityConstraint
+    compare_schema_availability  /  get_data_coverage_summary  /  find_data_gaps
+
+**Data querying**
+    construct_data_url  ─→  URL string
+    query_sdmx_data    ─→  DataFrame  (fetch + parse in one step)
+    fetch_sdmx_data    ─→  raw CSV string
+
+**Validation**
+    create_validator  ─→  SDMXValidator
+    validate_sdmx_csv ─→  ValidationResult
+    generate_validation_report  ─→  formatted report string
+
+**Cross-dataflow join (horizontal)**
+    compare_schemas       ─→  SchemaComparison
+    detect_unit_conflicts ─→  UnitConflictReport
+    harmonize_units       ─→  (DataFrame, DataFrame)
+    align_frequencies     ─→  FrequencyAlignment
+    detect_join_columns   ─→  Vector{String}
+    sdmx_join             ─→  JoinResult
+
+**Cross-dataflow combine (vertical)**
+    sdmx_combine    ─→  CombineResult
+    pivot_sdmx_wide ─→  DataFrame
+
+**Pipeline operators**
+    chain  /  pipeline  /  tap  /  branch  /  parallel_map
+    ⊆  (subset)  /  ⇒  (pipe)
+
+**Units & conversion**
+    sdmx_to_unitful  ─→  SDMXUnitSpec
+    are_units_convertible  /  conversion_factor  /  unit_multiplier
+    ExchangeRateTable: add_rate!, get_rate, convert_currency
+
+# Core types
+
+- [`DataflowSchema`](@ref): dimensions, attributes, codelists, and metadata for a dataflow
+- [`AvailabilityConstraint`](@ref): which dimension values and time periods have data
+- [`ValidationResult`](@ref): outcome of validating a CSV against a schema
+- [`SchemaComparison`](@ref): shared/unique dimensions and codelist overlaps between two schemas
+- [`UnitConflictReport`](@ref): unit mismatches detected between two DataFrames
+- [`JoinResult`](@ref): joined DataFrame plus diagnostics from `sdmx_join`
+- [`CombineResult`](@ref): vertically stacked DataFrame plus diagnostics from `sdmx_combine`
+- [`FrequencyAlignment`](@ref): frequency conversion metadata from `align_frequencies`
+- [`SDMXUnitSpec`](@ref): Unitful mapping for an SDMX unit code
+- [`ExchangeRateTable`](@ref): currency exchange rates for unit harmonization
+
+# Utilities
+
+- [`fetch_sdmx_xml`](@ref): auto-detects URL / XML string / file path and returns an EzXML document
+- [`normalize_sdmx_url`](@ref): normalises SDMX REST URLs to canonical form
+- [`clean_sdmx_data`](@ref): type-coerce and tidy a raw SDMX CSV DataFrame
+- [`summarize_data`](@ref): quick summary statistics for an SDMX DataFrame
+
+See also: `SDMXerWizard` (SDMXLLM.jl) for LLM-powered mapping, script generation, and workflow orchestration.
 """
 module SDMXer
 
@@ -104,5 +173,10 @@ export align_frequencies
 # Intelligent joining of SDMX DataFrames from different dataflows
 export JoinResult
 export detect_join_columns, sdmx_join
+
+# === CROSS-DATAFLOW COMBINE (VERTICAL STACKING) ===
+# Tidy-data vertical stacking of SDMX DataFrames with provenance tracking
+export CombineResult
+export sdmx_combine, pivot_sdmx_wide
 
 end # module SDMXer

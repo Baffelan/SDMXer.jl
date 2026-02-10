@@ -1305,11 +1305,14 @@ function get_rule_category(rule_id::String)
 end
 
 """
-    generate_validation_report(result::ValidationResult; 
+    generate_validation_report(result::ValidationResult;
                               format::String = "text",
                               include_details::Bool = true) -> String
 
 Generates a formatted validation report.
+
+# See also
+[`validate_sdmx_csv`](@ref), [`ValidationResult`](@ref)
 """
 function generate_validation_report(result::ValidationResult; 
                                    format::String = "text",

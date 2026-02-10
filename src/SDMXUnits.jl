@@ -165,9 +165,12 @@ const SDMX_UNIT_MAP = Dict{String, SDMXUnitSpec}(
 # =================== CORE FUNCTIONS ===================
 
 """
-    sdmx_to_unitful(code::String) -> Union{SDMXUnitSpec, Nothing}
+    sdmx_to_unitful(code::AbstractString) -> Union{SDMXUnitSpec, Nothing}
 
 Look up an SDMX UNIT_MEASURE code and return its SDMXUnitSpec, or `nothing` if unknown.
+
+Accepts any AbstractString subtype (String, String7, SubString, etc.) so it works
+directly with CSV.jl InlineStrings columns.
 
 # Examples
 ```julia
@@ -178,12 +181,12 @@ spec.category  # :mass
 sdmx_to_unitful("UNKNOWN")  # nothing
 ```
 """
-function sdmx_to_unitful(code::String)
+function sdmx_to_unitful(code::AbstractString)
     return get(SDMX_UNIT_MAP, uppercase(code), nothing)
 end
 
 """
-    are_units_convertible(code_a::String, code_b::String) -> Bool
+    are_units_convertible(code_a::AbstractString, code_b::AbstractString) -> Bool
 
 Check whether two SDMX unit codes are convertible via Unitful dimensional analysis.
 Returns `false` for cross-currency pairs (same dimension but conversion requires rates).
@@ -195,7 +198,7 @@ are_units_convertible("KG", "L")   # false — mass vs volume
 are_units_convertible("USD", "EUR") # false — currencies need exchange rates
 ```
 """
-function are_units_convertible(code_a::String, code_b::String)
+function are_units_convertible(code_a::AbstractString, code_b::AbstractString)
     spec_a = sdmx_to_unitful(code_a)
     spec_b = sdmx_to_unitful(code_b)
     isnothing(spec_a) && return false
@@ -209,7 +212,7 @@ function are_units_convertible(code_a::String, code_b::String)
 end
 
 """
-    conversion_factor(from::String, to::String) -> Union{Float64, Nothing}
+    conversion_factor(from::AbstractString, to::AbstractString) -> Union{Float64, Nothing}
 
 Return the deterministic conversion factor from one SDMX unit to another.
 Returns `nothing` for currencies (use ExchangeRateTable instead) or incompatible units.
@@ -222,7 +225,7 @@ conversion_factor("USD", "EUR") # nothing — use exchange rates
 conversion_factor("KG", "L")   # nothing — incompatible dimensions
 ```
 """
-function conversion_factor(from::String, to::String)
+function conversion_factor(from::AbstractString, to::AbstractString)
     from == to && return 1.0
     are_units_convertible(from, to) || return nothing
     spec_from = sdmx_to_unitful(from)
@@ -257,7 +260,7 @@ end
 # =================== EXCHANGE RATE TABLE ===================
 
 """
-    add_rate!(table::ExchangeRateTable, from::String, to::String, rate::Float64)
+    add_rate!(table::ExchangeRateTable, from::AbstractString, to::AbstractString, rate::Float64)
 
 Add an exchange rate to the table. Automatically adds the inverse rate.
 
@@ -268,14 +271,16 @@ add_rate!(table, "USD", "FJD", 2.299)
 # Now table has both USD→FJD (2.299) and FJD→USD (1/2.299)
 ```
 """
-function add_rate!(table::ExchangeRateTable, from::String, to::String, rate::Float64)
-    table.rates[(from, to)] = rate
-    table.rates[(to, from)] = 1.0 / rate
+function add_rate!(table::ExchangeRateTable, from::AbstractString, to::AbstractString, rate::Float64)
+    f = String(from)
+    t = String(to)
+    table.rates[(f, t)] = rate
+    table.rates[(t, f)] = 1.0 / rate
     return table
 end
 
 """
-    get_rate(table::ExchangeRateTable, from::String, to::String) -> Union{Float64, Nothing}
+    get_rate(table::ExchangeRateTable, from::AbstractString, to::AbstractString) -> Union{Float64, Nothing}
 
 Get the exchange rate from one currency to another. Tries direct lookup first,
 then derives cross-rate via USD if both USD-based rates exist.
@@ -288,14 +293,16 @@ get_rate(table, "FJD", "AUD")  # derived cross-rate
 get_rate(table, "XXX", "YYY")  # nothing
 ```
 """
-function get_rate(table::ExchangeRateTable, from::String, to::String)
+function get_rate(table::ExchangeRateTable, from::AbstractString, to::AbstractString)
     from == to && return 1.0
+    f = String(from)
+    t = String(to)
     # Direct lookup
-    direct = get(table.rates, (from, to), nothing)
+    direct = get(table.rates, (f, t), nothing)
     !isnothing(direct) && return direct
     # Try cross-rate via USD
-    from_usd = get(table.rates, (from, "USD"), nothing)
-    usd_to = get(table.rates, ("USD", to), nothing)
+    from_usd = get(table.rates, (f, "USD"), nothing)
+    usd_to = get(table.rates, ("USD", t), nothing)
     if !isnothing(from_usd) && !isnothing(usd_to)
         return from_usd * usd_to
     end
@@ -303,7 +310,7 @@ function get_rate(table::ExchangeRateTable, from::String, to::String)
 end
 
 """
-    convert_currency(value::Real, from::String, to::String, table::ExchangeRateTable) -> Union{Float64, Nothing}
+    convert_currency(value::Real, from::AbstractString, to::AbstractString, table::ExchangeRateTable) -> Union{Float64, Nothing}
 
 Convert a monetary value from one currency to another using the exchange rate table.
 Returns `nothing` if no rate is available.
@@ -315,7 +322,7 @@ convert_currency(100.0, "USD", "FJD", table)  # ≈ 229.9
 convert_currency(100.0, "FJD", "AUD", table)  # derived via cross-rate
 ```
 """
-function convert_currency(value::Real, from::String, to::String, table::ExchangeRateTable)
+function convert_currency(value::Real, from::AbstractString, to::AbstractString, table::ExchangeRateTable)
     rate = get_rate(table, from, to)
     isnothing(rate) && return nothing
     return Float64(value * rate)

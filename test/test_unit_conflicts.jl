@@ -79,6 +79,100 @@ using DataFrames
         @test report.unit_mult_conflicts[1].is_convertible == true
     end
 
+    @testset "detect_unit_conflicts — grouped: different indicators, different units" begin
+        # Scenario: df_a has monetary (FJD) and mass (TON) indicators
+        # df_b has count (NUM) indicators. Joining on GEO + TIME_PERIOD + INDICATOR.
+        # Only indicator "IND1" appears in both — FJD vs NUM is a real conflict.
+        # "IND2" (TON) only appears in df_a, so TON vs NUM is NOT a conflict.
+        df_a = DataFrame(
+            GEO = ["FJ", "FJ", "FJ"],
+            TIME_PERIOD = ["2020", "2020", "2020"],
+            INDICATOR = ["IND1", "IND2", "IND1"],
+            OBS_VALUE = [100.0, 50.0, 200.0],
+            UNIT_MEASURE = ["FJD", "TON", "FJD"]
+        )
+        df_b = DataFrame(
+            GEO = ["FJ", "FJ"],
+            TIME_PERIOD = ["2020", "2020"],
+            INDICATOR = ["IND1", "IND3"],
+            OBS_VALUE = [5000.0, 3000.0],
+            UNIT_MEASURE = ["NUM", "NUM"]
+        )
+
+        # Grouped: only IND1 matches, so only FJD vs NUM should be flagged
+        report_grouped = detect_unit_conflicts(df_a, df_b;
+            join_dims = ["GEO", "TIME_PERIOD", "INDICATOR"])
+        grouped_pairs = Set((c.value_a, c.value_b) for c in report_grouped.unit_measure_conflicts)
+        @test ("FJD", "NUM") in grouped_pairs
+        @test !(("TON", "NUM") in grouped_pairs)  # TON never matched — not a conflict
+
+        # All-vs-all: both FJD-NUM and TON-NUM would be flagged
+        report_allvsall = detect_unit_conflicts(df_a, df_b)
+        allvsall_pairs = Set((c.value_a, c.value_b) for c in report_allvsall.unit_measure_conflicts)
+        @test ("FJD", "NUM") in allvsall_pairs
+        @test ("TON", "NUM") in allvsall_pairs  # false positive in all-vs-all
+    end
+
+    @testset "detect_unit_conflicts — grouped: same unit everywhere, no conflict" begin
+        df_a = DataFrame(
+            GEO = ["FJ", "TV"],
+            OBS_VALUE = [100.0, 200.0],
+            UNIT_MEASURE = ["USD", "USD"]
+        )
+        df_b = DataFrame(
+            GEO = ["FJ", "TV"],
+            OBS_VALUE = [50.0, 60.0],
+            UNIT_MEASURE = ["USD", "USD"]
+        )
+
+        report = detect_unit_conflicts(df_a, df_b; join_dims = ["GEO"])
+        @test isempty(report.conflicts)
+    end
+
+    @testset "detect_unit_conflicts — grouped: join dim not in both DFs falls back" begin
+        df_a = DataFrame(
+            COUNTRY = ["FJ"],
+            OBS_VALUE = [100.0],
+            UNIT_MEASURE = ["KG"]
+        )
+        df_b = DataFrame(
+            REGION = ["Pacific"],
+            OBS_VALUE = [1.0],
+            UNIT_MEASURE = ["T"]
+        )
+
+        # join_dims don't exist in both → falls back to all-vs-all
+        report = detect_unit_conflicts(df_a, df_b; join_dims = ["COUNTRY"])
+        @test length(report.unit_measure_conflicts) == 1
+        @test report.unit_measure_conflicts[1].value_a == "KG"
+        @test report.unit_measure_conflicts[1].value_b == "T"
+    end
+
+    @testset "detect_unit_conflicts — grouped UNIT_MULT" begin
+        df_a = DataFrame(
+            GEO = ["FJ", "FJ"],
+            INDICATOR = ["GDP", "POP"],
+            OBS_VALUE = [1.0, 2.0],
+            UNIT_MULT = [6, 0]
+        )
+        df_b = DataFrame(
+            GEO = ["FJ"],
+            INDICATOR = ["GDP"],
+            OBS_VALUE = [3.0],
+            UNIT_MULT = [3]
+        )
+
+        # Only GDP matches: UNIT_MULT 6 vs 3 is a real conflict
+        report = detect_unit_conflicts(df_a, df_b; join_dims = ["GEO", "INDICATOR"])
+        @test length(report.unit_mult_conflicts) == 1
+        @test report.unit_mult_conflicts[1].value_a == "6"
+        @test report.unit_mult_conflicts[1].value_b == "3"
+
+        # All-vs-all would also flag 0 vs 3 (POP vs GDP) — a false positive
+        report_all = detect_unit_conflicts(df_a, df_b)
+        @test length(report_all.unit_mult_conflicts) == 2
+    end
+
     @testset "normalize_units! — UNIT_MULT" begin
         df = DataFrame(
             OBS_VALUE = [5.0, 10.0],

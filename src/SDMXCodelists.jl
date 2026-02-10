@@ -157,6 +157,9 @@ This function traverses the document to find all `<structure:Codelist>` elements
     - `order::Union{String, Missing}`
 
 If no codelists or codes are found, it returns an empty DataFrame with the correct schema.
+
+# See also
+[`filter_codelists_by_availability`](@ref), [`DataflowSchema`](@ref)
 """
 function extract_all_codelists(doc::EzXML.Document)
     doc_root = root(doc)

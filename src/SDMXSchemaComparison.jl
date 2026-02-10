@@ -25,6 +25,10 @@ Result of comparing two sets of codelist codes.
 - `overlap_ratio::Float64`: |intersection| / |union|, 0.0–1.0
 - `a_coverage::Float64`: Fraction of A's codes found in B
 - `b_coverage::Float64`: Fraction of B's codes found in A
+
+# See also
+- [`codelist_overlap`](@ref): computes this result from two code vectors or DataFrames
+- [`compare_schemas`](@ref): uses codelist overlap internally
 """
 struct CodelistOverlap
     intersection::Vector{String}
@@ -51,6 +55,11 @@ Result of comparing two DataflowSchema objects.
 - `time_overlap::Union{NamedTuple, Nothing}`: Overlapping time range, or nothing
 - `joinability_score::Float64`: Overall joinability score 0.0–1.0
 - `recommended_join_dims::Vector{String}`: Recommended dimension IDs for joining
+
+# See also
+- [`compare_schemas`](@ref): produces this result from two `DataflowSchema` objects
+- [`sdmx_join`](@ref): uses comparison results to join DataFrames
+- [`detect_join_columns`](@ref): uses recommended join dims from comparison
 """
 struct SchemaComparison
     schema_a_info::NamedTuple
@@ -146,6 +155,9 @@ comparison.shared_dimensions       # DataFrame of shared dims
 comparison.recommended_join_dims   # suggested join columns
 comparison.joinability_score       # 0.0–1.0
 ```
+
+# See also
+[`SchemaComparison`](@ref), [`DataflowSchema`](@ref), [`sdmx_join`](@ref), [`detect_join_columns`](@ref), [`detect_unit_conflicts`](@ref)
 """
 function compare_schemas(schema_a::DataflowSchema, schema_b::DataflowSchema)
     dims_a = schema_a.dimensions

@@ -57,7 +57,10 @@ println("Required attributes: ", required_attrs.concept_id)
 ```
 
 # See also
-[`extract_dataflow_schema`](@ref)
+- [`extract_dataflow_schema`](@ref): constructs this type from XML or URL
+- [`compare_schemas`](@ref): compares two `DataflowSchema` objects for joinability
+- [`create_validator`](@ref): builds a validator from a schema
+- [`query_sdmx_data`](@ref): fetches data described by a schema
 """
 struct DataflowSchema
     dataflow_info::NamedTuple
@@ -263,6 +266,9 @@ Extracts complete dataflow schema information from an SDMX structure document.
 
 # Returns
 - `DataflowSchema`: A comprehensive schema object with all dataflow structure information.
+
+# See also
+[`extract_dataflow_schema(::String)`](@ref), [`DataflowSchema`](@ref), [`compare_schemas`](@ref), [`create_validator`](@ref)
 """
 function extract_dataflow_schema(doc::EzXML.Document)
     rootnode = root(doc)
@@ -367,7 +373,7 @@ println("Attributes: ", nrow(schema.attributes))
 - `KeyError`: If required SDMX elements are missing
 
 # See also
-[`extract_dataflow_schema(::EzXML.Document)`](@ref), [`DataflowSchema`](@ref), [`fetch_sdmx_xml`](@ref)
+[`extract_dataflow_schema(::EzXML.Document)`](@ref), [`DataflowSchema`](@ref), [`fetch_sdmx_xml`](@ref), [`compare_schemas`](@ref), [`create_validator`](@ref)
 """
 function extract_dataflow_schema(input::String)
     try

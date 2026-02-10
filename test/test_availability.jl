@@ -291,9 +291,8 @@ using EzXML
         doc_invalid = parsexml(xml_str_invalid_obs)
         constraint_node_invalid = root(doc_invalid)
         
-        # Should warn and default to 0
-        @test_logs (:warn,) SDMXer.extract_availability_from_node(constraint_node_invalid)
-        availability_invalid = SDMXer.extract_availability_from_node(constraint_node_invalid)
+        # Should warn and default to 0 (expected warning from invalid fixture)
+        availability_invalid = @test_logs (:warn,) SDMXer.extract_availability_from_node(constraint_node_invalid)
         @test availability_invalid.total_observations == 0
     end
 

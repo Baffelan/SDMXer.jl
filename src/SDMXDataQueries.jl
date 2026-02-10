@@ -402,7 +402,7 @@ println("Retrieved ", nrow(data), " observations")
 ```
 
 # See also
-[`construct_data_url`](@ref), [`fetch_sdmx_data`](@ref), [`summarize_data`](@ref)
+[`construct_data_url`](@ref), [`fetch_sdmx_data`](@ref), [`summarize_data`](@ref), [`validate_sdmx_csv`](@ref)
 """
 function query_sdmx_data(base_url::String, agency_id::String, dataflow_id::String, version::String="latest";
                         key::String="",

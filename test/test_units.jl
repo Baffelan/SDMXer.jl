@@ -126,6 +126,32 @@ using SDMXer
         @test convert_currency(100.0, "USD", "XXX", table) === nothing
     end
 
+    @testset "AbstractString compatibility (String7/SubString)" begin
+        # CSV.jl produces String7/String15 (InlineStrings) for short columns.
+        # SubString is the easiest non-String AbstractString to test with.
+        kg_sub = SubString("KG", 1, 2)
+        t_sub = SubString("__T__", 3, 3)
+        usd_sub = SubString("USD", 1, 3)
+        fjd_sub = SubString("FJD", 1, 3)
+
+        # sdmx_to_unitful
+        @test sdmx_to_unitful(kg_sub) isa SDMXUnitSpec
+        @test sdmx_to_unitful(kg_sub).code == "KG"
+
+        # are_units_convertible
+        @test are_units_convertible(kg_sub, t_sub) == true
+        @test are_units_convertible(usd_sub, fjd_sub) == false
+
+        # conversion_factor
+        @test conversion_factor(kg_sub, t_sub) ≈ 0.001
+
+        # get_rate / add_rate! / convert_currency
+        table = ExchangeRateTable()
+        add_rate!(table, usd_sub, fjd_sub, 2.299)
+        @test get_rate(table, usd_sub, fjd_sub) ≈ 2.299
+        @test convert_currency(100.0, usd_sub, fjd_sub, table) ≈ 229.9
+    end
+
     @testset "default_exchange_rates" begin
         table = default_exchange_rates()
         @test !isempty(table.rates)

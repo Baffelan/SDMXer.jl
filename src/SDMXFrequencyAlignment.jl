@@ -20,6 +20,9 @@ Describes the frequency alignment applied to a pair of DataFrames.
 - `target_freq::String`: Target frequency after alignment (e.g., "A")
 - `method::Symbol`: Alignment method used (:aggregate, :none, :passthrough)
 - `aggregation_fn::Symbol`: Aggregation function used (:sum, :mean, :last, :first, :max, :min)
+
+# See also
+- [`align_frequencies`](@ref): produces this result when aligning two DataFrames
 """
 struct FrequencyAlignment
     source_freq::String

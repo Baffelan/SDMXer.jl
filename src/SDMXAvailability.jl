@@ -124,6 +124,10 @@ end
     AvailabilityConstraint
 
 Complete availability constraint information from SDMXer.
+
+# See also
+- [`extract_availability`](@ref): extracts this from a dataflow URL or XML
+- [`filter_codelists_by_availability`](@ref): filters codelists using availability data
 """
 struct AvailabilityConstraint
     constraint_id::String

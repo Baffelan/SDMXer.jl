@@ -21,6 +21,8 @@ makedocs(
             "Pipelines" => "api/pipelines.md",
             "Elements" => "api/elements.md",
             "Utilities" => "api/utilities.md",
+            "Units & Conversion" => "api/units.md",
+            "Cross-Dataflow Joins" => "api/joins.md",
         ],
         "Examples" => "examples.md",
     ],
